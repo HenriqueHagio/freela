@@ -1,6 +1,7 @@
 package com.example.demo.Principal;
 
 import com.example.demo.Cadastro.TelaCadastramento;
+import com.example.demo.Conexao.PostgreSQLConnector;
 import com.example.demo.Cadastro.TelaPontosCadastrados;
 import com.example.demo.Estoque.TelaCadastroEstoque;
 import com.example.demo.Estoque.TelaEstoque;
@@ -35,6 +36,8 @@ public class HelloApplication extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        PostgreSQLConnector.criarTabelaUsuario();
+
         primaryStage.setTitle("Sistema de Lubrificação - Login");
 
         // Criando um VBox para o layout de login
@@ -44,11 +47,11 @@ public class HelloApplication extends Application {
         loginLayout.setPadding(new Insets(20));
 
         // Adicionando um ImageView para um ícone ou logotipo
-        ImageView logoImageView = new ImageView(new Image("C:\\Users\\Lucas\\OneDrive\\Documentos\\Codigos Lubvel\\demo (2)\\src\\main\\java\\com\\example\\demo\\Principal\\img.png"));
+        ImageView logoImageView = new ImageView(new Image("D:\\Github\\demo2\\demo (2)\\src\\main\\java\\com\\example\\demo\\Principal\\img.png"));
         logoImageView.setFitHeight(100);  // Ajuste a altura conforme necessário
         logoImageView.setPreserveRatio(true);
 
-// Criando um VBox para o layout de login
+        // Criando um VBox para o layout de login
         loginLayout = new VBox(20);
         loginLayout.setAlignment(Pos.CENTER);  // Centraliza os elementos verticalmente
         loginLayout.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, CornerRadii.EMPTY, Insets.EMPTY)));
@@ -60,17 +63,19 @@ public class HelloApplication extends Application {
         TextField usernameField = createStyledTextField();
         PasswordField passwordField = createStyledPasswordField();
 
-        Button loginButton = createStyledButton();
+        Button loginButton = createStyledButton("Login");
+        Button registerButton = createStyledButton("Registrar");
         loginButton.setOnAction(event -> {
+
             String username = usernameField.getText();
             String password = passwordField.getText();
 
             if (authenticate(username, password)) {
-                if (isAdmin(username)) {
-                    showAdminScreen(primaryStage, username);
-                } else {
+//                if (isAdmin(username)) {
+//                    showAdminScreen(primaryStage, username);
+//                } else {
                     showMainMenu(primaryStage, username);
-                }
+
             } else {
                 showError("Credenciais inválidas. Tente novamente.");
             }
@@ -85,7 +90,7 @@ public class HelloApplication extends Application {
             }
         });
 
-        loginLayout.getChildren().addAll(logoImageView, titleLabel, usernameField, passwordField, loginButton, forgotPasswordLink);
+        loginLayout.getChildren().addAll(logoImageView, titleLabel, usernameField, passwordField, registerButton,loginButton, forgotPasswordLink);
 
         Scene scene = new Scene(loginLayout, 400, 400);
         primaryStage.setScene(scene);
@@ -106,8 +111,8 @@ public class HelloApplication extends Application {
         return passwordField;
     }
 
-    private Button createStyledButton() {
-        Button button = new Button("Login");
+    private Button createStyledButton(String arg) {
+        Button button = new Button(arg);
         button.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-padding: 10px;");
         button.setOnMouseEntered(e -> button.setStyle("-fx-background-color: #45a049; -fx-text-fill: white; -fx-padding: 10px;"));
         button.setOnMouseExited(e -> button.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-padding: 10px;"));
@@ -115,14 +120,18 @@ public class HelloApplication extends Application {
     }
 
     private static boolean authenticate(String username, String password) {
-        // Lógica de autenticação fictícia
-        return (username.equals(Credenciais.USUARIO) && password.equals(Credenciais.SENHA_USUARIO))
-                || (username.equals(Credenciais.ADMIN) && password.equals(Credenciais.SENHA_ADMIN));
+        Credenciais credenciais = new Credenciais();
+        // Verifique as credenciais
+        boolean credenciaisValidas = credenciais.verificarCredenciais(username, password);
+        // Retorne true apenas se as credenciais fornecidas forem válidas
+        return credenciaisValidas;
     }
 
-    private static boolean isAdmin(String username) {
-        return username.equals(Credenciais.ADMIN);
-    }
+
+//    private static boolean isAdmin(String username) {
+////        return username.equals(Credenciais.ADMIN);
+//        return null;
+//    }
 
     private static void showError(String message) {
         // Método para exibir mensagens de erro
@@ -204,11 +213,11 @@ public class HelloApplication extends Application {
                 cadastroEstoqueButton
         );
 
-        if (isAdmin(username)) {
-            Button gerenciarUsuariosButton = criarBotao("Gerenciar Usuários");
-            gerenciarUsuariosButton.setOnAction(event -> showGerenciamentoUsuarios(primaryStage));
-            menuLayout.getChildren().add(gerenciarUsuariosButton);
-        }
+//        if (isAdmin(username)) {
+//            Button gerenciarUsuariosButton = criarBotao("Gerenciar Usuários");
+//            gerenciarUsuariosButton.setOnAction(event -> showGerenciamentoUsuarios(primaryStage));
+//            menuLayout.getChildren().add(gerenciarUsuariosButton);
+//        }
 
         Scene mainScene = new Scene(menuLayout, 500, 400);
         primaryStage.setScene(mainScene);
