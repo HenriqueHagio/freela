@@ -1,28 +1,27 @@
 package com.example.demo.comeco;
 
+import com.example.demo.Conexao.PostgreSQLConnector;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import javafx.scene.control.TextInputDialog;
 
 import java.util.Optional;
 
 public class TelaCriarNovoUsuario {
 
-    private TelaGerenciarClientes telaGerenciarClientes;
-
-    public TelaCriarNovoUsuario(TelaGerenciarClientes telaGerenciarClientes) {
-        this.telaGerenciarClientes = telaGerenciarClientes;
-    }
+//    private TelaGerenciarClientes telaGerenciarClientes;
+//
+//    public TelaCriarNovoUsuario(TelaGerenciarClientes telaGerenciarClientes) {
+//        this.telaGerenciarClientes = telaGerenciarClientes;
+//    }
 
     public TelaCriarNovoUsuario() {
         // Remova a inicialização desnecessária da telaGerenciarClientes aqui
     }
+
+    Usuario usuario = new Usuario();
 
     public void start(Stage stage) {
         stage.setTitle("Criar Novo Usuário");
@@ -81,13 +80,17 @@ public class TelaCriarNovoUsuario {
 
     private void cadastrarNovoUsuario(String nome, String sobrenome, String username, String email, String senha, String confirmarSenha, String empresa, Stage stage) {
         if (senha.equals(confirmarSenha)) {
-            if (telaGerenciarClientes != null) {
+//            if (telaGerenciarClientes != null) {
                 TelaGerenciarClientes.Cliente novoCliente = new TelaGerenciarClientes.Cliente(nome, sobrenome, email, senha, empresa);
-                telaGerenciarClientes.adicionarNovoCliente(novoCliente);  // Adiciona o novo cliente à lista e atualiza a tabela
+                usuario.setPassword(senha);
+                usuario.setUsername(username);
+                usuario.setRole("Comum");
+//                telaGerenciarClientes.adicionarNovoCliente(novoCliente);  // Adiciona o novo cliente à lista e atualiza a tabela
+                PostgreSQLConnector.criarUsuario(usuario);
                 stage.close();
-            } else {
-                System.out.println("Erro: TelaGerenciarClientes não foi inicializada corretamente.");
-            }
+//            } else {
+//                System.out.println("Erro: TelaGerenciarClientes não foi inicializada corretamente.");
+//            }
         } else {
             System.out.println("Erro: As senhas não coincidem. Tente novamente.");
         }

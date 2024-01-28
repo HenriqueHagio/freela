@@ -6,10 +6,7 @@ import com.example.demo.Cadastro.TelaPontosCadastrados;
 import com.example.demo.Estoque.TelaCadastroEstoque;
 import com.example.demo.Estoque.TelaEstoque;
 import com.example.demo.Lubrificantes.TelaLubrificantes;
-import com.example.demo.comeco.Credenciais;
-import com.example.demo.comeco.TelaAdministrador;
-import com.example.demo.comeco.TelaGerenciarClientes;
-import com.example.demo.comeco.TelaRecuperacaoSenha;
+import com.example.demo.comeco.*;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -62,9 +59,17 @@ public class HelloApplication extends Application {
 
         TextField usernameField = createStyledTextField();
         PasswordField passwordField = createStyledPasswordField();
-
-        Button loginButton = createStyledButton("Login");
+        // Criar usuario
         Button registerButton = createStyledButton("Registrar");
+        registerButton.setOnAction(event -> {
+            try {
+                showTelaCriarNovoUsuario();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        // Logar no sistema
+        Button loginButton = createStyledButton("Login");
         loginButton.setOnAction(event -> {
 
             String username = usernameField.getText();
@@ -147,6 +152,12 @@ public class HelloApplication extends Application {
         TelaRecuperacaoSenha telaRecuperacaoSenha = new TelaRecuperacaoSenha();
         Stage recoveryStage = new Stage();
         telaRecuperacaoSenha.start(recoveryStage);
+    }
+    private static void showTelaCriarNovoUsuario() throws IOException {
+        // Método para exibir a tela de novo usuario
+        TelaCriarNovoUsuario telaCriarNovoUsuario = new TelaCriarNovoUsuario();
+        Stage recoveryStage = new Stage();
+        telaCriarNovoUsuario.start(recoveryStage);
     }
 
     private static void showAdminScreen(Stage primaryStage, String username) {
