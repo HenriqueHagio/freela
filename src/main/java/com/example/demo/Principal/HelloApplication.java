@@ -16,10 +16,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
@@ -48,14 +45,11 @@ public class HelloApplication extends Application {
         logoImageView.setFitHeight(100);  // Ajuste a altura conforme necessário
         logoImageView.setPreserveRatio(true);
 
-// Criando um VBox para o layout de login
-        loginLayout = new VBox(20);
-        loginLayout.setAlignment(Pos.CENTER);  // Centraliza os elementos verticalmente
-        loginLayout.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, CornerRadii.EMPTY, Insets.EMPTY)));
-        loginLayout.setPadding(new Insets(5));
         // Adicionando o título
         Label titleLabel = new Label("Bem-vindo ao Sistema de Lubrificação");
         titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+
+        loginLayout.getChildren().addAll(logoImageView, titleLabel);
 
         TextField usernameField = createStyledTextField();
         PasswordField passwordField = createStyledPasswordField();
@@ -85,7 +79,7 @@ public class HelloApplication extends Application {
             }
         });
 
-        loginLayout.getChildren().addAll(logoImageView, titleLabel, usernameField, passwordField, loginButton, forgotPasswordLink);
+        loginLayout.getChildren().addAll(usernameField, passwordField, loginButton, forgotPasswordLink);
 
         Scene scene = new Scene(loginLayout, 400, 400);
         primaryStage.setScene(scene);
@@ -174,7 +168,7 @@ public class HelloApplication extends Application {
             Stage lubrificantesStage = new Stage();
 
             // Substitua o caminho do arquivo conforme necessário
-            String filePath = "C:\\Users\\Lucas\\OneDrive\\Documentos\\BD_PRODUTOS_LUBVEL.xlsx";
+            String filePath = "C:\\Users\\Lucas\\OneDrive\\Documentos\\Codigos Lubvel\\BD_PRODUTOS_LUBVEL.xlsx";
             telaLubrificantes.start(lubrificantesStage, filePath);
         });
 

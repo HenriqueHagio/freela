@@ -2,7 +2,6 @@ package com.example.demo.Estoque;
 
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.value.ObservableValue;
 
 public class ItemEstoque {
     private String nomeProduto;
@@ -14,6 +13,9 @@ public class ItemEstoque {
         this.nomeProduto = nomeProduto;
         this.quantidadeProperty.set(quantidade);
         this.unidade = unidade;
+    }
+
+    public ItemEstoque() {
     }
 
     public String getNomeProduto() {
@@ -40,14 +42,11 @@ public class ItemEstoque {
         this.unidade = unidade;
     }
 
-    public ObservableValue<String> nomeProdutoProperty() {
-        return null;
+    public String getLubrificante() {
+        return lubrificante;
     }
 
     public void setLubrificante(String lubrificanteSelecionado) {
-    }
-
-    public String getLubrificante() {
-        return lubrificante;
+        this.lubrificante = lubrificanteSelecionado;
     }
 }

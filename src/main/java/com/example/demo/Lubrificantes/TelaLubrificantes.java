@@ -21,87 +21,102 @@ import java.util.List;
 
 public class TelaLubrificantes extends Application {
 
+    private Stage stage;
+    private String filePath;
+
+    public TelaLubrificantes(Stage stage, String filePath) {
+        this.stage = stage;
+        this.filePath = filePath;
+    }
+
+    public TelaLubrificantes() {
+
+    }
+
     public void start(Stage lubrificantesStage, String filePath) {
-        TableView<Lubrificante> table = new TableView<>();
-        TableColumn<Lubrificante, String> codigoColumn = new TableColumn<>("Código");
-        codigoColumn.setCellValueFactory(cellData -> cellData.getValue().codigoProperty());
-        TableColumn<Lubrificante, String> descricaoColumn = new TableColumn<>("Descrição");
-        descricaoColumn.setCellValueFactory(cellData -> cellData.getValue().descricaoProperty());
+        if (this.filePath != null) {
+            try (FileInputStream file = new FileInputStream(new File("C:\\Users\\Lucas\\OneDrive\\Documentos\\Codigos Lubvel\\BD_PRODUTOS_LUBVEL.xlsx"))) {
+                Workbook workbook = WorkbookFactory.create(file);
+                Sheet sheet = workbook.getSheetAt(0);
 
-        table.getColumns().addAll(codigoColumn, descricaoColumn);
+                TableView<Lubrificante> table = new TableView<>();
+                TableColumn<Lubrificante, String> codigoColumn = new TableColumn<>("Código");
+                codigoColumn.setCellValueFactory(cellData -> cellData.getValue().codigoProperty());
+                TableColumn<Lubrificante, String> descricaoColumn = new TableColumn<>("Descrição");
+                descricaoColumn.setCellValueFactory(cellData -> cellData.getValue().descricaoProperty());
 
-        List<Lubrificante> listaLubrificantes = new ArrayList<>();
+                table.getColumns().addAll(codigoColumn, descricaoColumn);
 
-        try (FileInputStream file = new FileInputStream(new File(filePath))) {
-            Workbook workbook = WorkbookFactory.create(file);
-            Sheet sheet = workbook.getSheetAt(0); // Obtém a primeira planilha
+                List<Lubrificante> listaLubrificantes = new ArrayList<>();
 
-            Iterator<Row> rowIterator = sheet.iterator();
-            rowIterator.next(); // Ignora cabeçalho, se existir
+                Iterator<Row> rowIterator = sheet.iterator();
+                rowIterator.next();
 
-            while (rowIterator.hasNext()) {
-                Row row = rowIterator.next();
+                while (rowIterator.hasNext()) {
+                    Row row = rowIterator.next();
 
-                Cell codigoCell = row.getCell(0);
-                String codigo;
-                if (codigoCell.getCellType() == CellType.NUMERIC) {
-                    codigo = String.valueOf((int) codigoCell.getNumericCellValue());
-                } else {
-                    codigo = codigoCell.getStringCellValue();
-                }
-
-                Cell descricaoCell = row.getCell(1);
-                String descricao;
-                if (descricaoCell.getCellType() == CellType.NUMERIC) {
-                    descricao = String.valueOf((int) descricaoCell.getNumericCellValue());
-                } else {
-                    descricao = descricaoCell.getStringCellValue();
-                }
-
-                Lubrificante lubrificante = new Lubrificante(codigo, descricao);
-                listaLubrificantes.add(lubrificante);
-            }
-
-            ObservableList<Lubrificante> data = FXCollections.observableArrayList(listaLubrificantes);
-            FilteredList<Lubrificante> filteredData = new FilteredList<>(data);
-
-            table.setItems(filteredData);
-
-            TextField searchField = new TextField();
-            searchField.setPromptText("Pesquisar...");
-
-            searchField.textProperty().addListener((observable, oldValue, newValue) -> {
-                filteredData.setPredicate(lubrificante -> {
-                    if (newValue == null || newValue.isEmpty()) {
-                        return true;
+                    Cell codigoCell = row.getCell(0);
+                    String codigo;
+                    if (codigoCell.getCellType() == CellType.NUMERIC) {
+                        codigo = String.valueOf((int) codigoCell.getNumericCellValue());
+                    } else {
+                        codigo = codigoCell.getStringCellValue();
                     }
 
-                    String lowerCaseFilter = newValue.toLowerCase();
+                    Cell descricaoCell = row.getCell(1);
+                    String descricao;
+                    if (descricaoCell.getCellType() == CellType.NUMERIC) {
+                        descricao = String.valueOf((int) descricaoCell.getNumericCellValue());
+                    } else {
+                        descricao = descricaoCell.getStringCellValue();
+                    }
 
-                    return lubrificante.getCodigo().toLowerCase().contains(lowerCaseFilter) ||
-                            lubrificante.getDescricao().toLowerCase().contains(lowerCaseFilter);
+                    Lubrificante lubrificante = new Lubrificante(codigo, descricao);
+                    listaLubrificantes.add(lubrificante);
+                }
+
+                ObservableList<Lubrificante> data = FXCollections.observableArrayList(listaLubrificantes);
+                FilteredList<Lubrificante> filteredData = new FilteredList<>(data);
+
+                table.setItems(filteredData);
+
+                TextField searchField = new TextField();
+                searchField.setPromptText("Pesquisar...");
+
+                searchField.textProperty().addListener((observable, oldValue, newValue) -> {
+                    filteredData.setPredicate(lubrificante -> {
+                        if (newValue == null || newValue.isEmpty()) {
+                            return true;
+                        }
+
+                        String lowerCaseFilter = newValue.toLowerCase();
+
+                        return lubrificante.getCodigo().toLowerCase().contains(lowerCaseFilter) ||
+                                lubrificante.getDescricao().toLowerCase().contains(lowerCaseFilter);
+                    });
                 });
-            });
 
-            VBox root = new VBox(10, searchField, table); // Utilizando VBox para o layout
+                VBox root = new VBox(10, searchField, table);
+                Scene scene = new Scene(root, 600, 400);
+                stage.setScene(scene);
+                stage.setTitle("Lista de Lubrificantes");
+                stage.show();
 
-            Scene scene = new Scene(root, 600, 400); // Ajustando o tamanho da cena
-            lubrificantesStage.setScene(scene);
-            lubrificantesStage.setTitle("Lista de Lubrificantes"); // Definindo um título para a janela
-            lubrificantesStage.show();
-
-            workbook.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+                workbook.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            System.err.println("O caminho do arquivo é nulo.");
         }
     }
 
-    /**
-     * @param stage
-     * @throws Exception
-     */
     @Override
     public void start(Stage stage) throws Exception {
+        // Implementação opcional, dependendo do seu fluxo de inicialização
+    }
 
+    public static void main(String[] args) {
+        launch(args);
     }
 }
