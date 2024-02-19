@@ -1,14 +1,13 @@
 package com.example.demo.comeco;
 
+import com.example.demo.Hibernate.Entidade;
+import com.example.demo.Hibernate.HibernateEntidade;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import javafx.scene.control.TextInputDialog;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.Optional;
 
@@ -81,12 +80,34 @@ public class TelaCriarNovoUsuario {
 
     private void cadastrarNovoUsuario(String nome, String sobrenome, String username, String email, String senha, String confirmarSenha, String empresa, Stage stage) {
         if (senha.equals(confirmarSenha)) {
-            if (telaGerenciarClientes != null) {
-                TelaGerenciarClientes.Cliente novoCliente = new TelaGerenciarClientes.Cliente(nome, sobrenome, email, senha, empresa);
-                telaGerenciarClientes.adicionarNovoCliente(novoCliente);  // Adiciona o novo cliente à lista e atualiza a tabela
-                stage.close();
-            } else {
-                System.out.println("Erro: TelaGerenciarClientes não foi inicializada corretamente.");
+            String senhaHash = BCrypt.hashpw(senha, BCrypt.gensalt());
+            Usuario usuario = new Usuario();
+            Empresa empresaNova = new Empresa();
+            Pessoa pessoa = new Pessoa();
+            empresaNova.setNome(empresa);
+            pessoa.setNome(nome);
+            pessoa.setSobrenome(sobrenome);
+            pessoa.setEmail(email);
+            pessoa.setEmpresa(empresaNova);
+            usuario.setUsername(username);
+            usuario.setPassword(senhaHash);
+            usuario.setPessoa(pessoa);
+
+            Entidade<Object> dao = new HibernateEntidade<>();
+
+            try {
+                dao.salvar(empresaNova);
+                dao.salvar(pessoa);
+                dao.salvar(usuario);
+                if (telaGerenciarClientes != null) {
+                    TelaGerenciarClientes.Cliente novoCliente = new TelaGerenciarClientes.Cliente(nome, sobrenome, email, senha, empresa);
+                    telaGerenciarClientes.adicionarNovoCliente(novoCliente);  // Adiciona o novo cliente à lista e atualiza a tabela
+                    stage.close();
+                } else {
+                    System.out.println("Erro: TelaGerenciarClientes não foi inicializada corretamente.");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         } else {
             System.out.println("Erro: As senhas não coincidem. Tente novamente.");

@@ -5,10 +5,7 @@ import com.example.demo.Cadastro.TelaPontosCadastrados;
 import com.example.demo.Estoque.TelaCadastroEstoque;
 import com.example.demo.Estoque.TelaEstoque;
 import com.example.demo.Lubrificantes.TelaLubrificantes;
-import com.example.demo.comeco.Credenciais;
-import com.example.demo.comeco.TelaAdministrador;
-import com.example.demo.comeco.TelaGerenciarClientes;
-import com.example.demo.comeco.TelaRecuperacaoSenha;
+import com.example.demo.comeco.*;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -19,12 +16,14 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.IOException;
 
 public class HelloApplication extends Application {
 
     private static TelaEstoque telaEstoque;
+
 
     public static void main(String[] args) {
         launch(args);
@@ -41,7 +40,7 @@ public class HelloApplication extends Application {
         loginLayout.setPadding(new Insets(20));
 
         // Adicionando um ImageView para um ícone ou logotipo
-        ImageView logoImageView = new ImageView(new Image("C:\\Users\\Lucas\\OneDrive\\Documentos\\Codigos Lubvel\\demo (2)\\src\\main\\java\\com\\example\\demo\\Principal\\img.png"));
+        ImageView logoImageView = new ImageView(new Image("D:\\demo (2)\\src\\main\\java\\com\\example\\demo\\Principal\\img.png"));
         logoImageView.setFitHeight(100);  // Ajuste a altura conforme necessário
         logoImageView.setPreserveRatio(true);
 
@@ -54,10 +53,19 @@ public class HelloApplication extends Application {
         TextField usernameField = createStyledTextField();
         PasswordField passwordField = createStyledPasswordField();
 
-        Button loginButton = createStyledButton();
+        // HBox para os botões "Registre-se" e "Login"
+        HBox buttonsBox = new HBox(10);
+        buttonsBox.setAlignment(Pos.CENTER);
+        buttonsBox.getChildren().addAll(
+                createStyledButton("Login"),
+                createStyledButton("Registre-se")
+                );
+
+        Button loginButton = (Button) buttonsBox.getChildren().get(0);
         loginButton.setOnAction(event -> {
             String username = usernameField.getText();
             String password = passwordField.getText();
+
 
             if (authenticate(username, password)) {
                 if (isAdmin(username)) {
@@ -70,6 +78,12 @@ public class HelloApplication extends Application {
             }
         });
 
+        Button registerButton = (Button) buttonsBox.getChildren().get(1);
+        registerButton.setOnAction(event -> {
+            showNewUserScreen(primaryStage);
+        });
+
+
         Hyperlink forgotPasswordLink = new Hyperlink("Esqueceu a senha?");
         forgotPasswordLink.setOnAction(event -> {
             try {
@@ -79,7 +93,8 @@ public class HelloApplication extends Application {
             }
         });
 
-        loginLayout.getChildren().addAll(usernameField, passwordField, loginButton, forgotPasswordLink);
+        loginLayout.getChildren().addAll(usernameField, passwordField, buttonsBox, forgotPasswordLink);
+
 
         Scene scene = new Scene(loginLayout, 400, 400);
         primaryStage.setScene(scene);
@@ -100,8 +115,8 @@ public class HelloApplication extends Application {
         return passwordField;
     }
 
-    private Button createStyledButton() {
-        Button button = new Button("Login");
+    private Button createStyledButton(String value) {
+        Button button = new Button(value);
         button.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-padding: 10px;");
         button.setOnMouseEntered(e -> button.setStyle("-fx-background-color: #45a049; -fx-text-fill: white; -fx-padding: 10px;"));
         button.setOnMouseExited(e -> button.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-padding: 10px;"));
@@ -109,10 +124,18 @@ public class HelloApplication extends Application {
     }
 
     private static boolean authenticate(String username, String password) {
-        // Lógica de autenticação fictícia
-        return (username.equals(Credenciais.USUARIO) && password.equals(Credenciais.SENHA_USUARIO))
-                || (username.equals(Credenciais.ADMIN) && password.equals(Credenciais.SENHA_ADMIN));
+        // Lógica para buscar informações do usuário (incluindo a senha criptografada) a partir do banco de dados
+        Usuario usuario = new Usuario();
+        usuario = usuario.buscarUsuarioPorNome(username);
+
+        // Verifica se o usuário foi encontrado e se a senha corresponde à senha armazenada no banco de dados
+        if (usuario != null) {
+            String hashedPassword = usuario.getPassword(); // Obtém a senha criptografada do usuário
+            return BCrypt.checkpw(password, hashedPassword); // Verifica se a senha fornecida corresponde à senha criptografada
+        }
+        return false; // Retorna falso se o usuário não foi encontrado
     }
+
 
     private static boolean isAdmin(String username) {
         return username.equals(Credenciais.ADMIN);
@@ -132,6 +155,10 @@ public class HelloApplication extends Application {
         TelaRecuperacaoSenha telaRecuperacaoSenha = new TelaRecuperacaoSenha();
         Stage recoveryStage = new Stage();
         telaRecuperacaoSenha.start(recoveryStage);
+    }
+    private static void showNewUserScreen(Stage primaryStage){
+        TelaCriarNovoUsuario telaCriarNovoUsuario = new TelaCriarNovoUsuario();
+        telaCriarNovoUsuario.start(primaryStage);
     }
 
     private static void showAdminScreen(Stage primaryStage, String username) {
@@ -200,7 +227,7 @@ public class HelloApplication extends Application {
 
         if (isAdmin(username)) {
             Button gerenciarUsuariosButton = criarBotao("Gerenciar Usuários");
-            gerenciarUsuariosButton.setOnAction(event -> showGerenciamentoUsuarios(primaryStage));
+//            gerenciarUsuariosButton.setOnAction(event -> showGerenciamentoUsuarios(primaryStage));
             menuLayout.getChildren().add(gerenciarUsuariosButton);
         }
 
@@ -217,9 +244,9 @@ public class HelloApplication extends Application {
         return button;
     }
 
-    private static void showGerenciamentoUsuarios(Stage primaryStage) {
-        TelaGerenciarClientes telaGerenciamentoUsuarios = new TelaGerenciarClientes();
-        Stage gerenciamentoUsuariosStage = new Stage();
-        telaGerenciamentoUsuarios.start(gerenciamentoUsuariosStage);
-    }
+//    private static void showGerenciamentoUsuarios(Stage primaryStage) {
+//        TelaGerenciarClientes telaGerenciamentoUsuarios = new TelaGerenciarClientes();
+//        Stage gerenciamentoUsuariosStage = new Stage();
+//        telaGerenciamentoUsuarios.start(gerenciamentoUsuariosStage);
+//    }
 }
