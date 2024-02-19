@@ -16,16 +16,23 @@ module com.example.demo {
     requires java.desktop;
     requires com.fasterxml.jackson.core;
     requires org.apache.poi.ooxml;
+    requires com.fasterxml.jackson.annotation;
+    requires com.fasterxml.jackson.databind;
+    requires java.persistence;
+    requires lombok;
+    requires org.hibernate.orm.core;
+    requires jbcrypt;
+    requires java.mail;
 
-    opens com.example.demo to javafx.fxml;
+    opens com.example.demo;
     exports com.example.demo.Principal;
     exports com.example.demo.Cadastro;
     exports com.example.demo.Estoque;
-    opens com.example.demo.Cadastro to javafx.fxml;
+    opens com.example.demo.Cadastro;
     exports com.example.demo.Lubrificantes;
-    opens com.example.demo.Lubrificantes to javafx.fxml;
+    opens com.example.demo.Lubrificantes;
     exports com.example.demo;
-    opens com.example.demo.Principal to javafx.fxml;
+    opens com.example.demo.Principal;
     exports com.example.demo.comeco;
-    opens com.example.demo.comeco to javafx.fxml;
+    opens com.example.demo.comeco;
 }

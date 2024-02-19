@@ -1,9 +1,14 @@
 package com.example.demo.Cadastro;
 
 import javafx.application.Application;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -24,30 +29,50 @@ public class TelaPontosCadastrados extends Application {
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Pontos Cadastrados");
 
-        VBox layout = new VBox(10);
+        BorderPane layout = new BorderPane();
         layout.setStyle("-fx-background-color: #f4f4f4; -fx-padding: 20px;"); // Estilo de fundo e espaçamento interno
+
+        // Adicionando um ImageView para a logo no canto superior direito
+        ImageView logoImageView = new ImageView(new Image("C:\\Users\\Lucas\\OneDrive\\Documentos\\Codigos Lubvel\\demo (2)\\src\\main\\java\\com\\example\\demo\\Principal\\img.png"));
+        logoImageView.setFitHeight(50);  // Ajuste a altura conforme necessário
+        logoImageView.setPreserveRatio(true);
+
+        // Criando um HBox para organizar a imagem no canto superior direito
+        HBox logoBox = new HBox(10);
+        logoBox.setAlignment(Pos.CENTER_RIGHT);
+        logoBox.getChildren().add(logoImageView);
+        layout.setTop(logoBox);
 
         Label labelTitulo = new Label("Pontos Cadastrados");
         labelTitulo.setStyle("-fx-font-size: 24px; -fx-text-fill: #070000; -fx-font-weight: bold;"); // Estilo do título
-        layout.getChildren().add(labelTitulo);
+        layout.setLeft(labelTitulo);
+
+        VBox pontosVBox = new VBox(10);
+        pontosVBox.setAlignment(Pos.CENTER);
 
         if (pontosCadastrados != null && !pontosCadastrados.isEmpty()) {
             for (String ponto : pontosCadastrados) {
                 Button btnPonto = new Button(ponto);
                 btnPonto.setStyle("-fx-background-color: #e73737; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;"); // Estilo do botão
                 btnPonto.setOnAction(event -> exibirDetalhesPonto(ponto));
-                layout.getChildren().add(btnPonto);
+                pontosVBox.getChildren().add(btnPonto);
             }
         } else {
             Label labelVazia = new Label("Nenhum ponto cadastrado.");
             labelVazia.setStyle("-fx-font-size: 14px; -fx-text-fill: #333333;"); // Estilo do texto
-            layout.getChildren().add(labelVazia);
+            pontosVBox.getChildren().add(labelVazia);
         }
+
+        layout.setCenter(pontosVBox);
 
         Button voltarButton = new Button("Voltar");
         voltarButton.setStyle("-fx-background-color: #000000; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;"); // Estilo do botão Voltar
         voltarButton.setOnAction(event -> primaryStage.close());
-        layout.getChildren().add(voltarButton);
+
+        HBox bottomBox = new HBox(10);
+        bottomBox.setAlignment(Pos.CENTER_RIGHT);
+        bottomBox.getChildren().add(voltarButton);
+        layout.setBottom(bottomBox);
 
         Scene scene = new Scene(layout, 400, 300);
         primaryStage.setScene(scene);
@@ -55,19 +80,7 @@ public class TelaPontosCadastrados extends Application {
     }
 
     private void exibirDetalhesPonto(String ponto) {
-        Stage detalhesStage = new Stage();
-        detalhesStage.setTitle("Detalhes do Ponto");
-
-        VBox detalhesLayout = new VBox(10);
-        detalhesLayout.setStyle("-fx-background-color: #f4f4f4; -fx-padding: 20px;"); // Estilo de fundo e espaçamento interno
-
-        Label labelPonto = new Label("Detalhes do Ponto: " + ponto);
-        labelPonto.setStyle("-fx-font-size: 18px; -fx-text-fill: #008CBA; -fx-font-weight: bold;"); // Estilo do título dos detalhes
-        detalhesLayout.getChildren().add(labelPonto);
-
-        Scene detalhesScene = new Scene(detalhesLayout, 300, 200);
-        detalhesStage.setScene(detalhesScene);
-        detalhesStage.show();
+        // Implemente a lógica para exibir os detalhes do ponto, se necessário.
     }
 
     public static void main(String[] args) {

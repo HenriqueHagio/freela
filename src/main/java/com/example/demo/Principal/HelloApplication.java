@@ -1,7 +1,6 @@
 package com.example.demo.Principal;
 
 import com.example.demo.Cadastro.TelaCadastramento;
-import com.example.demo.Conexao.PostgreSQLConnector;
 import com.example.demo.Cadastro.TelaPontosCadastrados;
 import com.example.demo.Estoque.TelaCadastroEstoque;
 import com.example.demo.Estoque.TelaEstoque;
@@ -14,12 +13,10 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.IOException;
 
@@ -27,14 +24,13 @@ public class HelloApplication extends Application {
 
     private static TelaEstoque telaEstoque;
 
+
     public static void main(String[] args) {
         launch(args);
     }
 
     @Override
     public void start(Stage primaryStage) {
-        PostgreSQLConnector.criarTabelaUsuario();
-
         primaryStage.setTitle("Sistema de Lubrificação - Login");
 
         // Criando um VBox para o layout de login
@@ -44,47 +40,49 @@ public class HelloApplication extends Application {
         loginLayout.setPadding(new Insets(20));
 
         // Adicionando um ImageView para um ícone ou logotipo
-        ImageView logoImageView = new ImageView(new Image("D:\\Github\\demo2\\demo (2)\\src\\main\\java\\com\\example\\demo\\Principal\\img.png"));
+        ImageView logoImageView = new ImageView(new Image("D:\\demo (2)\\src\\main\\java\\com\\example\\demo\\Principal\\img.png"));
         logoImageView.setFitHeight(100);  // Ajuste a altura conforme necessário
         logoImageView.setPreserveRatio(true);
 
-        // Criando um VBox para o layout de login
-        loginLayout = new VBox(20);
-        loginLayout.setAlignment(Pos.CENTER);  // Centraliza os elementos verticalmente
-        loginLayout.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, CornerRadii.EMPTY, Insets.EMPTY)));
-        loginLayout.setPadding(new Insets(5));
         // Adicionando o título
         Label titleLabel = new Label("Bem-vindo ao Sistema de Lubrificação");
         titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
+        loginLayout.getChildren().addAll(logoImageView, titleLabel);
+
         TextField usernameField = createStyledTextField();
         PasswordField passwordField = createStyledPasswordField();
-        // Criar usuario
-        Button registerButton = createStyledButton("Registrar");
-        registerButton.setOnAction(event -> {
-            try {
-                showTelaCriarNovoUsuario();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        });
-        // Logar no sistema
-        Button loginButton = createStyledButton("Login");
-        loginButton.setOnAction(event -> {
 
+        // HBox para os botões "Registre-se" e "Login"
+        HBox buttonsBox = new HBox(10);
+        buttonsBox.setAlignment(Pos.CENTER);
+        buttonsBox.getChildren().addAll(
+                createStyledButton("Login"),
+                createStyledButton("Registre-se")
+                );
+
+        Button loginButton = (Button) buttonsBox.getChildren().get(0);
+        loginButton.setOnAction(event -> {
             String username = usernameField.getText();
             String password = passwordField.getText();
 
-            if (authenticate(username, password)) {
-//                if (isAdmin(username)) {
-//                    showAdminScreen(primaryStage, username);
-//                } else {
-                    showMainMenu(primaryStage, username);
 
+            if (authenticate(username, password)) {
+                if (isAdmin(username)) {
+                    showAdminScreen(primaryStage, username);
+                } else {
+                    showMainMenu(primaryStage, username);
+                }
             } else {
                 showError("Credenciais inválidas. Tente novamente.");
             }
         });
+
+        Button registerButton = (Button) buttonsBox.getChildren().get(1);
+        registerButton.setOnAction(event -> {
+            showNewUserScreen(primaryStage);
+        });
+
 
         Hyperlink forgotPasswordLink = new Hyperlink("Esqueceu a senha?");
         forgotPasswordLink.setOnAction(event -> {
@@ -95,7 +93,7 @@ public class HelloApplication extends Application {
             }
         });
 
-        loginLayout.getChildren().addAll(logoImageView, titleLabel, usernameField, passwordField, registerButton,loginButton, forgotPasswordLink);
+        loginLayout.getChildren().addAll(usernameField, passwordField, buttonsBox, forgotPasswordLink);
 
         Scene scene = new Scene(loginLayout, 400, 400);
         primaryStage.setScene(scene);
@@ -116,8 +114,8 @@ public class HelloApplication extends Application {
         return passwordField;
     }
 
-    private Button createStyledButton(String arg) {
-        Button button = new Button(arg);
+    private Button createStyledButton(String value) {
+        Button button = new Button(value);
         button.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-padding: 10px;");
         button.setOnMouseEntered(e -> button.setStyle("-fx-background-color: #45a049; -fx-text-fill: white; -fx-padding: 10px;"));
         button.setOnMouseExited(e -> button.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-padding: 10px;"));
@@ -125,18 +123,22 @@ public class HelloApplication extends Application {
     }
 
     private static boolean authenticate(String username, String password) {
-        Credenciais credenciais = new Credenciais();
-        // Verifique as credenciais
-        boolean credenciaisValidas = credenciais.verificarCredenciais(username, password);
-        // Retorne true apenas se as credenciais fornecidas forem válidas
-        return credenciaisValidas;
+        // Lógica para buscar informações do usuário (incluindo a senha criptografada) a partir do banco de dados
+        Usuario usuario = new Usuario();
+        usuario = usuario.buscarUsuarioPorNome(username);
+
+        // Verifica se o usuário foi encontrado e se a senha corresponde à senha armazenada no banco de dados
+        if (usuario != null) {
+            String hashedPassword = usuario.getPassword(); // Obtém a senha criptografada do usuário
+            return BCrypt.checkpw(password, hashedPassword); // Verifica se a senha fornecida corresponde à senha criptografada
+        }
+        return false; // Retorna falso se o usuário não foi encontrado
     }
 
 
-//    private static boolean isAdmin(String username) {
-////        return username.equals(Credenciais.ADMIN);
-//        return null;
-//    }
+    private static boolean isAdmin(String username) {
+        return username.equals(Credenciais.ADMIN);
+    }
 
     private static void showError(String message) {
         // Método para exibir mensagens de erro
@@ -153,11 +155,9 @@ public class HelloApplication extends Application {
         Stage recoveryStage = new Stage();
         telaRecuperacaoSenha.start(recoveryStage);
     }
-    private static void showTelaCriarNovoUsuario() throws IOException {
-        // Método para exibir a tela de novo usuario
+    private static void showNewUserScreen(Stage primaryStage){
         TelaCriarNovoUsuario telaCriarNovoUsuario = new TelaCriarNovoUsuario();
-        Stage recoveryStage = new Stage();
-        telaCriarNovoUsuario.start(recoveryStage);
+        telaCriarNovoUsuario.start(primaryStage);
     }
 
     private static void showAdminScreen(Stage primaryStage, String username) {
@@ -194,7 +194,7 @@ public class HelloApplication extends Application {
             Stage lubrificantesStage = new Stage();
 
             // Substitua o caminho do arquivo conforme necessário
-            String filePath = "C:\\Users\\Lucas\\OneDrive\\Documentos\\BD_PRODUTOS_LUBVEL.xlsx";
+            String filePath = "C:\\Users\\Lucas\\OneDrive\\Documentos\\Codigos Lubvel\\BD_PRODUTOS_LUBVEL.xlsx";
             telaLubrificantes.start(lubrificantesStage, filePath);
         });
 
@@ -224,11 +224,11 @@ public class HelloApplication extends Application {
                 cadastroEstoqueButton
         );
 
-//        if (isAdmin(username)) {
-//            Button gerenciarUsuariosButton = criarBotao("Gerenciar Usuários");
+        if (isAdmin(username)) {
+            Button gerenciarUsuariosButton = criarBotao("Gerenciar Usuários");
 //            gerenciarUsuariosButton.setOnAction(event -> showGerenciamentoUsuarios(primaryStage));
-//            menuLayout.getChildren().add(gerenciarUsuariosButton);
-//        }
+            menuLayout.getChildren().add(gerenciarUsuariosButton);
+        }
 
         Scene mainScene = new Scene(menuLayout, 500, 400);
         primaryStage.setScene(mainScene);
@@ -243,9 +243,9 @@ public class HelloApplication extends Application {
         return button;
     }
 
-    private static void showGerenciamentoUsuarios(Stage primaryStage) {
-        TelaGerenciarClientes telaGerenciamentoUsuarios = new TelaGerenciarClientes();
-        Stage gerenciamentoUsuariosStage = new Stage();
-        telaGerenciamentoUsuarios.start(gerenciamentoUsuariosStage);
-    }
+//    private static void showGerenciamentoUsuarios(Stage primaryStage) {
+//        TelaGerenciarClientes telaGerenciamentoUsuarios = new TelaGerenciarClientes();
+//        Stage gerenciamentoUsuariosStage = new Stage();
+//        telaGerenciamentoUsuarios.start(gerenciamentoUsuariosStage);
+//    }
 }

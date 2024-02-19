@@ -8,10 +8,8 @@ public class PontoLubrificacao {
     private String lubrificante;
 
     public PontoLubrificacao() {
-        // Se precisar de inicializações no construtor, adicione aqui
     }
 
-    // Getters e Setters para os campos
 
     public String getSetor() {
         return setor;

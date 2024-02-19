@@ -63,7 +63,7 @@ public class TelaGerenciarClientes extends Application {
         tabelaClientes.setItems(listaClientes);
 
         // Inicializa a tela para criar novo usuário
-//        telaCriarNovoUsuario = new TelaCriarNovoUsuario(this);
+        telaCriarNovoUsuario = new TelaCriarNovoUsuario(this);
     }
 
     private void inicializarTabelaClientes() {

@@ -19,7 +19,7 @@ public class LeitorExcel {
     }
 
     public static void main(String[] args) {
-        String filePath = "C:\\Users\\Lucas\\OneDrive\\Documentos\\BD_PRODUTOS_LUBVEL.xlsx";
+        String filePath = "C:\\Users\\Lucas\\OneDrive\\Documentos\\Codigos Lubvel\\BD_PRODUTOS_LUBVEL.xlsx";
         List<Lubrificante> listaLubrificantes = lerArquivoExcel(filePath);
 
         // Verificação se a lista foi preenchida corretamente
@@ -76,13 +76,8 @@ public class LeitorExcel {
         return listaLubrificantes;
     }
 
-
     public static List<Lubrificante> getListaLubrificantes() {
         String filePath = "C:\\Users\\Lucas\\OneDrive\\Documentos\\BD_PRODUTOS_LUBVEL.xlsx";
         return LeitorExcel.lerArquivoExcel(filePath);
     }
-
 }
-
-
-

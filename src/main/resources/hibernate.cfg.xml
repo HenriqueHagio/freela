@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+
+    <session-factory>
+        <!-- Configurações de conexão com o banco de dados -->
+        <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
+        <property name="hibernate.connection.url">jdbc:postgresql://localhost:5432/demo</property>
+        <property name="hibernate.connection.username">postgres</property>
+        <property name="hibernate.connection.password">senha123</property>
+        <property name="hibernate.hbm2ddl.auto">update</property>
+
+        <!-- Configuração do pool de conexões -->
+        <property name="hibernate.connection.pool_size">5</property>
+
+        <!-- Desativando a criação automática de tabelas -->
+
+
+
+        <!-- Dialeto do PostgreSQL -->
+        <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQL95Dialect</property>
+
+        <!-- Outras propriedades de configuração -->
+        <!-- Mostrar SQL gerado -->
+        <property name="hibernate.show_sql">true</property>
+        <!-- Formatar SQL gerado -->
+        <property name="hibernate.format_sql">true</property>
+
+        <!-- Configuração de pooling de conexões (opcional) -->
+        <!-- <property name="hibernate.connection.pool_size">10</property> -->
+
+        <!-- Configurações de cache (opcional) -->
+        <!-- <property name="hibernate.cache.use_second_level_cache">true</property> -->
+        <!-- <property name="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.EhCacheRegionFactory</property> -->
+
+        <!-- Mapeamento de suas entidades -->
+         <mapping class="com.example.demo.comeco.Usuario"/>
+         <mapping class="com.example.demo.comeco.Empresa"/>
+         <mapping class="com.example.demo.comeco.Pessoa"/>
+
+    </session-factory>
+</hibernate-configuration>

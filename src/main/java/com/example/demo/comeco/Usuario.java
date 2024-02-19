@@ -1,9 +1,36 @@
 package com.example.demo.comeco;
 
+import com.example.demo.Hibernate.HibernateUtil;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
+
+import javax.persistence.*;
+import java.util.UUID;
+
+@Entity
+@Table(name = "usuario")
+@Getter @Setter
 public class Usuario {
+
+    /**
+     * Chave primária em UUID
+     */
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @EqualsAndHashCode.Include
+    protected UUID codigo;
+
     private String username;
     private String password;
     private String role;
+
+    @ManyToOne
+    private Pessoa pessoa;
+
 
     public Usuario(String username, String password, String role) {
         this.username = username;
@@ -14,28 +41,24 @@ public class Usuario {
     public Usuario() {
 
     }
-
-    public String getUsername() {
-        return username;
+    public Usuario buscarUsuarioPorNome(String username) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Criteria criteria = session.createCriteria(Usuario.class);
+        criteria.add(Restrictions.eq("username", username));
+        Usuario usuario = (Usuario) criteria.uniqueResult();
+        session.close();
+       return usuario;
     }
 
-    public String getPassword() {
-        return password;
+    public Usuario buscarUsuarioPorPessoa(Pessoa pessoa) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Criteria criteria = session.createCriteria(Usuario.class);
+        criteria.add(Restrictions.eq("pessoa", pessoa));
+        Usuario usuario = (Usuario) criteria.uniqueResult();
+        session.close();
+       return usuario;
     }
 
-    public String getRole() {
-        return role;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
+    public void salvar() {
     }
 }

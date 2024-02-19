@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -12,11 +13,10 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import org.apache.poi.ss.usermodel.*;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 
 public class TelaCadastroEstoque extends Application {
 
-    private static final String FILE_PATH = "C:\\Users\\Lucas\\OneDrive\\Documentos\\BD_PRODUTOS_LUBVEL.xlsx";
     private List<ItemEstoque> listaNovosProdutos = new ArrayList<>();
     private VBox produtosCadastradosVBox;
     private TextField quantityField;
@@ -74,6 +73,9 @@ public class TelaCadastroEstoque extends Application {
         Button saveButton = new Button("Salvar Todos");
         saveButton.setOnAction(e -> salvarTodos());
 
+        Button importButton = new Button("Importar XML");
+        importButton.setOnAction(e -> importarXML(primaryStage));
+
         produtosCadastradosVBox = new VBox(5);
         produtosCadastradosVBox.setPadding(new Insets(10));
         produtosCadastradosVBox.setStyle("-fx-border-color: black; -fx-border-width: 1px;");
@@ -82,15 +84,12 @@ public class TelaCadastroEstoque extends Application {
         grid.addRow(1, unitLabel, unidadeComboBox);
         grid.addRow(2, lubrificantesLabel, lubrificanteSearchField, lubrificantesComboBox);
 
-        vbox.getChildren().addAll(titleLabel, grid, addButton, saveButton, new Label("Produtos Cadastrados:"), produtosCadastradosVBox);
+        vbox.getChildren().addAll(titleLabel, grid, addButton, saveButton, importButton, new Label("Produtos Cadastrados:"), produtosCadastradosVBox);
         borderPane.setCenter(vbox);
 
-        Scene scene = new Scene(borderPane, 600, 400);  // Ajuste as dimensões conforme necessário
+        Scene scene = new Scene(borderPane, 600, 400);
         primaryStage.setScene(scene);
         primaryStage.show();
-
-        // Carregar lubrificantes do Excel
-        carregarLubrificantesDoExcel();
     }
 
     private void pesquisarLubrificantes(String keyword) {
@@ -103,7 +102,7 @@ public class TelaCadastroEstoque extends Application {
     }
 
     private void adicionarProduto() {
-        String nome = lubrificantesComboBox.getValue();  // Use o valor do ComboBox diretamente como o nome do produto
+        String nome = lubrificantesComboBox.getValue();
         String quantidadeStr = quantityField.getText();
         String unidade = unidadeComboBox.getValue().substring(0, 1);
         String lubrificanteSelecionado = lubrificantesComboBox.getValue();
@@ -115,9 +114,9 @@ public class TelaCadastroEstoque extends Application {
             listaNovosProdutos.add(novoItem);
             limparCampos();
             atualizarProdutosCadastrados();
-            System.out.println("Produto: " + nome + ", Quantidade: " + quantidade + " " + unidade + " adicionado à lista.");
+            exibirMensagem("Produto adicionado", "Produto: " + nome + ", Quantidade: " + quantidade + " " + unidade + " adicionado à lista.");
         } else {
-            System.out.println("Selecione um lubrificante válido e preencha uma quantidade válida.");
+            exibirMensagemErro("Erro", "Selecione um lubrificante válido e preencha uma quantidade válida.");
         }
     }
 
@@ -129,9 +128,9 @@ public class TelaCadastroEstoque extends Application {
             }
             listaNovosProdutos.clear();
             atualizarProdutosCadastrados();
-            System.out.println("Todos os produtos foram cadastrados com sucesso!");
+            exibirMensagem("Produtos salvos", "Todos os produtos foram cadastrados com sucesso!");
         } else {
-            System.out.println("Nenhum produto para salvar.");
+            exibirMensagem("Nenhum produto para salvar", "Nenhum produto para salvar.");
         }
     }
 
@@ -161,37 +160,33 @@ public class TelaCadastroEstoque extends Application {
         }
     }
 
-    private void carregarLubrificantesDoExcel() {
-        try {
-            Workbook workbook = WorkbookFactory.create(new File(FILE_PATH));
-            Sheet sheet = workbook.getSheetAt(0);
+    private void importarXML(Stage primaryStage) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Escolher arquivo XML");
+        File file = fileChooser.showOpenDialog(primaryStage);
 
-            for (Row row : sheet) {
-                List<String> valoresCelula = new ArrayList<>();
-                for (Cell cell : row) {
-                    valoresCelula.add(obterValorCelula(cell));
-                }
-                String linhaCompleta = String.join(" - ", valoresCelula);
-                nomesLubrificantes.add(linhaCompleta);
-            }
-
-            Collections.sort(nomesLubrificantes);
-            lubrificantesComboBox.setItems(FXCollections.observableArrayList(nomesLubrificantes));
-
-            workbook.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (file != null) {
+            XMLReader xmlReader = new XMLReader();  // Criando uma instância de XMLReader
+            List<ItemEstoque> produtosDoXML = xmlReader.lerArquivoXML(file.getPath());
+            listaNovosProdutos.addAll(produtosDoXML);
+            atualizarProdutosCadastrados();
+            exibirMensagem("Produtos importados", "Produtos importados do XML com sucesso!");
         }
     }
 
-    private String obterValorCelula(Cell cell) {
-        switch (cell.getCellType()) {
-            case STRING:
-                return cell.getStringCellValue();
-            case NUMERIC:
-                return String.valueOf((int) cell.getNumericCellValue());
-            default:
-                return "";
-        }
+    private void exibirMensagem(String titulo, String conteudo) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(titulo);
+        alert.setHeaderText(null);
+        alert.setContentText(conteudo);
+        alert.showAndWait();
+    }
+
+    private void exibirMensagemErro(String titulo, String conteudo) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(titulo);
+        alert.setHeaderText(null);
+        alert.setContentText(conteudo);
+        alert.showAndWait();
     }
 }
