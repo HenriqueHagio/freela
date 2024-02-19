@@ -95,6 +95,7 @@ public class HelloApplication extends Application {
 
         loginLayout.getChildren().addAll(usernameField, passwordField, buttonsBox, forgotPasswordLink);
 
+
         Scene scene = new Scene(loginLayout, 400, 400);
         primaryStage.setScene(scene);
         primaryStage.show();

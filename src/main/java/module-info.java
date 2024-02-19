@@ -24,6 +24,7 @@ module com.example.demo {
     requires jbcrypt;
     requires java.mail;
 
+
     opens com.example.demo;
     exports com.example.demo.Principal;
     exports com.example.demo.Cadastro;
