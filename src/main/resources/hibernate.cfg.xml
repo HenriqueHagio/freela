@@ -40,6 +40,7 @@
          <mapping class="com.example.demo.comeco.Usuario"/>
          <mapping class="com.example.demo.comeco.Empresa"/>
          <mapping class="com.example.demo.comeco.Pessoa"/>
+         <mapping class="com.example.demo.Cadastro.Ponto"/>
 
     </session-factory>
 </hibernate-configuration>

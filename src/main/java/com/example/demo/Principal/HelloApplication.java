@@ -40,7 +40,7 @@ public class HelloApplication extends Application {
         loginLayout.setPadding(new Insets(20));
 
         // Adicionando um ImageView para um ícone ou logotipo
-        ImageView logoImageView = new ImageView(new Image("D:\\demo (2)\\src\\main\\java\\com\\example\\demo\\Principal\\img.png"));
+        ImageView logoImageView = new ImageView(new Image("D:\\freela\\src\\main\\java\\com\\example\\demo\\Principal\\img.png"));
         logoImageView.setFitHeight(100);  // Ajuste a altura conforme necessário
         logoImageView.setPreserveRatio(true);
 
@@ -244,9 +244,9 @@ public class HelloApplication extends Application {
         return button;
     }
 
-//    private static void showGerenciamentoUsuarios(Stage primaryStage) {
-//        TelaGerenciarClientes telaGerenciamentoUsuarios = new TelaGerenciarClientes();
-//        Stage gerenciamentoUsuariosStage = new Stage();
-//        telaGerenciamentoUsuarios.start(gerenciamentoUsuariosStage);
-//    }
+    private static void showGerenciamentoUsuarios(Stage primaryStage) {
+        TelaGerenciarClientes telaGerenciamentoUsuarios = new TelaGerenciarClientes();
+        Stage gerenciamentoUsuariosStage = new Stage();
+        telaGerenciamentoUsuarios.start(gerenciamentoUsuariosStage);
+    }
 }

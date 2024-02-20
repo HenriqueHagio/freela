@@ -24,10 +24,11 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class TelaCadastramento extends Application implements LubrificanteSelecionadoListener {
+    Ponto ponto = new Ponto();
     private VBox layout;
     private String setor;
     private String equipamento;
-    private List<String> pontosLubrificacao = new ArrayList<>();
+    private List<Ponto> pontosLubrificacao = new ArrayList<>();
     private List<TextField> inputsLubrificante = new ArrayList<>();
     private List<TextField> inputsTagPonto = new ArrayList<>();
     private List<TextField> inputsQuantidadeLubrificante = new ArrayList<>();
@@ -57,7 +58,7 @@ public class TelaCadastramento extends Application implements LubrificanteSeleci
         primaryStage.setTitle("Cadastro de Pontos");
 
         // Adicionando um ImageView para um ícone ou logotipo
-        ImageView logoImageView = new ImageView(new Image("C:\\Users\\Lucas\\OneDrive\\Documentos\\Codigos Lubvel\\demo (2)\\src\\main\\java\\com\\example\\demo\\Principal\\img.png"));
+        ImageView logoImageView = new ImageView(new Image("D:\\freela\\src\\main\\java\\com\\example\\demo\\Principal\\img.png"));
         logoImageView.setFitHeight(50);  // Ajuste a altura conforme necessário
         logoImageView.setPreserveRatio(true);
 
@@ -109,6 +110,8 @@ public class TelaCadastramento extends Application implements LubrificanteSeleci
             int quantidadePontos = Integer.parseInt(quantidadePontosTexto);
             this.setor = setor;
             this.equipamento = equipamento;
+            ponto.setSetor(setor);
+            ponto.setEquipamento(equipamento);
             configurarTelaCadastroPontos(primaryStage, quantidadePontos);
         }
     }
@@ -137,13 +140,13 @@ public class TelaCadastramento extends Application implements LubrificanteSeleci
         layout.getChildren().clear();
         datasProximaTrocaLubrificante.clear();
 
-        Label setorLabel = new Label("Setor: " + setor);
-        Label equipamentoLabel = new Label("Equipamento: " + equipamento);
+        Label setorLabel = new Label("Setor: " + ponto.getSetor());
+        Label equipamentoLabel = new Label("Equipamento: " + ponto.getEquipamento());
         setorLabel.setStyle("-fx-font-size: 16; -fx-font-weight: bold;");
         equipamentoLabel.setStyle("-fx-font-size: 16; -fx-font-weight: bold;");
 
         // Adicionando um ImageView para um ícone ou logotipo
-        ImageView logoImageView = new ImageView(new Image("C:\\Users\\Lucas\\OneDrive\\Documentos\\Codigos Lubvel\\demo (2)\\src\\main\\java\\com\\example\\demo\\Principal\\img.png"));
+        ImageView logoImageView = new ImageView(new Image("D:\\freela\\src\\main\\java\\com\\example\\demo\\Principal\\img.png"));
         logoImageView.setFitHeight(50);  // Ajuste a altura conforme necessário
         logoImageView.setPreserveRatio(true);
 
@@ -201,8 +204,8 @@ public class TelaCadastramento extends Application implements LubrificanteSeleci
     }
 
     private VBox criarLayoutPonto(int pontoNumero) {
-        Label labelSetor = new Label("Setor: " + setor);
-        Label labelEquipamento = new Label("Equipamento: " + equipamento);
+        Label labelSetor = new Label("Setor: " + ponto.getSetor());
+        Label labelEquipamento = new Label("Equipamento: " + ponto.getEquipamento());
         labelSetor.setStyle("-fx-font-size: 15;");
         labelEquipamento.setStyle("-fx-font-size: 15;");
 
@@ -282,7 +285,7 @@ public class TelaCadastramento extends Application implements LubrificanteSeleci
             exibirAlerta("Insira pelo menos um ponto de lubrificação.");
         } else {
             for (int i = 0; i < pontosLubrificacao.size(); i++) {
-                String pontoString = pontosLubrificacao.get(i);
+                Ponto pontoString = pontosLubrificacao.get(i);
                 LocalDateTime dataLubrificacao = null;
 
                 if (inputsDataLubrificacao.get(i) instanceof DatePicker) {
@@ -312,16 +315,16 @@ public class TelaCadastramento extends Application implements LubrificanteSeleci
                         return;
                     }
 
-                    pontosLubrificacao.add("Setor: " + setor + ", Equipamento: " + equipamento + ", Ponto: " + inputsLubrificante.get(i).getText() +
-                            ", Tag: " + inputsTagPonto.get(i).getText() +
-                            ", Lubrificante: " + lubrificante.getCodigo() +
-                            ", Quantidade: " + inputsQuantidadeLubrificante.get(i).getText() + " " + "Gramas" +
-                            ", Data e Hora Lubrificação: " + dataLubrificacao +
-                            ", Próxima Data Lubrificação: " + proximaDataLubrificacao +
-                            ", Quantidade de Graxa: " + quantidadeGraxa +
-                            ", Componentes do Equipamento: " + componentesEquipamento +
-                            ", Operação: " + operacao +
-                            ", Observações: " + observacoes);
+//                    pontosLubrificacao.add("Setor: " + setor + ", Equipamento: " + equipamento + ", Ponto: " + inputsLubrificante.get(i).getText() +
+//                            ", Tag: " + inputsTagPonto.get(i).getText() +
+//                            ", Lubrificante: " + lubrificante.getCodigo() +
+//                            ", Quantidade: " + inputsQuantidadeLubrificante.get(i).getText() + " " + "Gramas" +
+//                            ", Data e Hora Lubrificação: " + dataLubrificacao +
+//                            ", Próxima Data Lubrificação: " + proximaDataLubrificacao +
+//                            ", Quantidade de Graxa: " + quantidadeGraxa +
+//                            ", Componentes do Equipamento: " + componentesEquipamento +
+//                            ", Operação: " + operacao +
+//                            ", Observações: " + observacoes);
                 } else {
                     exibirAlerta("Selecione um lubrificante antes de cadastrar.");
                 }
@@ -355,16 +358,16 @@ public class TelaCadastramento extends Application implements LubrificanteSeleci
         telaPesquisa.setLubrificanteSelecionadoListener(lubrificanteSelecionado -> {
             inputsLubrificante.get(index).setText(lubrificanteSelecionado.getDescricao());
             inputsQuantidadeLubrificante.get(index).setText("1");
-            pontosLubrificacao.add("Setor: " + setor + ", Equipamento: " + equipamento + ", Ponto: " + inputsLubrificante.get(index).getText() +
-                    ", Tag: " + inputsTagPonto.get(index).getText() +
-                    ", Lubrificante: " + lubrificanteSelecionado.getCodigo() +
-                    ", Quantidade: 1 " + "Gramas" +
-                    ", Data e Hora Lubrificação: " + inputsDataLubrificacao.get(index).getValue() +
-                    ", Próxima Data Lubrificação: " + inputsProximaDataLubrificacao.get(index).getValue() +
-                    ", Quantidade de Graxa: " + inputsQuantidadeGraxa.get(index).getText() +
-                    ", Componentes do Equipamento: " + inputsComponentesEquipamento.get(index).getText() +
-                    ", Operação: " + inputsOperacao.get(index).getText() +
-                    ", Observações: " + inputsObservacoes.get(index).getText());
+//            pontosLubrificacao.add("Setor: " + setor + ", Equipamento: " + equipamento + ", Ponto: " + inputsLubrificante.get(index).getText() +
+//                    ", Tag: " + inputsTagPonto.get(index).getText() +
+//                    ", Lubrificante: " + lubrificanteSelecionado.getCodigo() +
+//                    ", Quantidade: 1 " + "Gramas" +
+//                    ", Data e Hora Lubrificação: " + inputsDataLubrificacao.get(index).getValue() +
+//                    ", Próxima Data Lubrificação: " + inputsProximaDataLubrificacao.get(index).getValue() +
+//                    ", Quantidade de Graxa: " + inputsQuantidadeGraxa.get(index).getText() +
+//                    ", Componentes do Equipamento: " + inputsComponentesEquipamento.get(index).getText() +
+//                    ", Operação: " + inputsOperacao.get(index).getText() +
+//                    ", Observações: " + inputsObservacoes.get(index).getText());
         });
         telaPesquisa.start(stagePesquisa);
     }
