@@ -107,11 +107,13 @@ public class TelaAdministrador extends Application {
     }
 
     private void abrirTelaLubrificantes() {
-        TelaLubrificantes telaLubrificantes = new TelaLubrificantes();
         Stage lubrificantesStage = new Stage();
         // Substitua o caminho do arquivo conforme necessário
         String filePath = "C:\\Users\\Lucas\\OneDrive\\Documentos\\BD_PRODUTOS_LUBVEL.xlsx";
-        telaLubrificantes.start(lubrificantesStage, filePath);
+        TelaLubrificantes telaLubrificantes = new TelaLubrificantes(lubrificantesStage, filePath);
+
+
+        telaLubrificantes.start();
     }
 
     private void abrirTelaEstoque() {

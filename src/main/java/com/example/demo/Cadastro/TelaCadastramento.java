@@ -1,5 +1,6 @@
 package com.example.demo.Cadastro;
 
+import com.example.demo.Cadastro.Constante.UnidadeMedida;
 import com.example.demo.Lubrificantes.Lubrificante;
 import com.example.demo.Lubrificantes.LubrificanteSelecionadoListener;
 import com.example.demo.Lubrificantes.TelaPesquisaLubrificantes;
@@ -15,8 +16,11 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import lombok.Getter;
+import lombok.Setter;
 import org.controlsfx.control.Notifications;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -24,27 +28,21 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class TelaCadastramento extends Application implements LubrificanteSelecionadoListener {
-    Ponto ponto = new Ponto();
+    PontoLubrificacao pontoLubrificacao = new PontoLubrificacao();
     private VBox layout;
-    private String setor;
-    private String equipamento;
-    private List<Ponto> pontosLubrificacao = new ArrayList<>();
-    private List<TextField> inputsLubrificante = new ArrayList<>();
-    private List<TextField> inputsTagPonto = new ArrayList<>();
-    private List<TextField> inputsQuantidadeLubrificante = new ArrayList<>();
-    private List<DatePicker> inputsDataLubrificacao = new ArrayList<>();
-    private List<TextField> inputsObservacoes = new ArrayList<>();
-    private List<DatePicker> inputsProximaDataLubrificacao = new ArrayList<>();
-    private List<TextField> inputsQuantidadeGraxa = new ArrayList<>();
-    private List<TextField> inputsComponentesEquipamento = new ArrayList<>();
-    private List<TextField> inputsOperacao = new ArrayList<>();
+    private final List<PontoLubrificacao> pontosLubrificacao = new ArrayList<>();
+    private final List<Lubrificante> lubrificantes = new ArrayList<>();
+    private final List<TextField> inputsQuantidadeLubrificante = new ArrayList<>();
     private TextField campoCodigo;
     private TextField campoDescricao;
-    private Lubrificante lubrificante;
+    private Lubrificante lubrificante = new Lubrificante();
     private Consumer<Stage> onCadastroConcluido;
-    private List<LocalDateTime> datasProximaTrocaLubrificante = new ArrayList<>();
-    private List<LocalDateTime> datasLubrificacao = new ArrayList<>();
+    private final List<LocalDateTime> datasProximaTrocaLubrificante = new ArrayList<>();
+    private final List<LocalDateTime> datasLubrificacao = new ArrayList<>();
     private static final int INTERVALO_LUBRIFICACAO_DIAS = 30;
+
+    private VBox pontoLayout;
+
 
     public TelaCadastramento(Consumer<Stage> onCadastroConcluido) {
         this.onCadastroConcluido = onCadastroConcluido;
@@ -52,6 +50,25 @@ public class TelaCadastramento extends Application implements LubrificanteSeleci
 
     public TelaCadastramento() {
     }
+    @Getter @Setter
+    public class PontoObj{
+        private String setor;
+        private String equipamento;
+        private String tagPonto;
+        private String lubrificante;
+        private int quantidadeLub;
+        private UnidadeMedida unidadeMedida;
+        private LocalDate dataLub;
+        private LocalDate dataproxLub;
+        private int quantidadeGraxa;
+        private String componentesEquip;
+        private String operacao;
+        private String obs;
+    }
+
+
+
+
 
     @Override
     public void start(Stage primaryStage) {
@@ -96,7 +113,6 @@ public class TelaCadastramento extends Application implements LubrificanteSeleci
                 labelQuantidadePontos, inputQuantidadePontos,
                 confirmarButton
         );
-
         ScrollPane scrollPane = new ScrollPane(layout);
         scrollPane.setFitToWidth(true);
 
@@ -108,10 +124,12 @@ public class TelaCadastramento extends Application implements LubrificanteSeleci
     private void processarConfirmacao(Stage primaryStage, String setor, String equipamento, String quantidadePontosTexto) {
         if (validarCampos(setor, equipamento, quantidadePontosTexto)) {
             int quantidadePontos = Integer.parseInt(quantidadePontosTexto);
-            this.setor = setor;
-            this.equipamento = equipamento;
-            ponto.setSetor(setor);
-            ponto.setEquipamento(equipamento);
+
+            for(int i = 1; i <= Integer.parseInt(quantidadePontosTexto); i++){
+                pontoLubrificacao.setSetor(setor);
+                pontoLubrificacao.setEquipamento(equipamento);
+                pontosLubrificacao.add(pontoLubrificacao);
+            }
             configurarTelaCadastroPontos(primaryStage, quantidadePontos);
         }
     }
@@ -140,8 +158,8 @@ public class TelaCadastramento extends Application implements LubrificanteSeleci
         layout.getChildren().clear();
         datasProximaTrocaLubrificante.clear();
 
-        Label setorLabel = new Label("Setor: " + ponto.getSetor());
-        Label equipamentoLabel = new Label("Equipamento: " + ponto.getEquipamento());
+        Label setorLabel = new Label("Setor: " + pontoLubrificacao.getSetor());
+        Label equipamentoLabel = new Label("Equipamento: " + pontoLubrificacao.getEquipamento());
         setorLabel.setStyle("-fx-font-size: 16; -fx-font-weight: bold;");
         equipamentoLabel.setStyle("-fx-font-size: 16; -fx-font-weight: bold;");
 
@@ -168,35 +186,23 @@ public class TelaCadastramento extends Application implements LubrificanteSeleci
 
         int numeroColunas = 6;
 
+
         for (int i = 1; i <= quantidadePontos; i++) {
-            datasLubrificacao.add(LocalDateTime.now());
-
-            DatePicker proximaDataPicker = new DatePicker();
-            inputsProximaDataLubrificacao.add(proximaDataPicker);
-
-            TextField inputQuantidadeGraxa = new TextField();
-            inputsQuantidadeGraxa.add(inputQuantidadeGraxa);
-
-            TextField inputComponentesEquipamento = new TextField();
-            inputsComponentesEquipamento.add(inputComponentesEquipamento);
-
-            TextField inputOperacao = new TextField();
-            inputsOperacao.add(inputOperacao);
-
-            VBox pontoLayout = criarLayoutPonto(i);
-
+            pontoLayout = criarLayoutPonto(i);
             gridPontos.add(pontoLayout, coluna, linha);
             coluna++;
-
             if (coluna == numeroColunas) {
                 coluna = 0;
                 linha++;
             }
+
+
+
         }
 
         Button cadastrarButton = new Button("Cadastrar");
         cadastrarButton.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white;");
-        cadastrarButton.setOnAction(event -> processarCadastro(primaryStage));
+        cadastrarButton.setOnAction(event -> processarCadastro(primaryStage, quantidadePontos));
 
         layoutCadastroPontos.getChildren().add(gridPontos);
         layoutCadastroPontos.getChildren().add(cadastrarButton);
@@ -204,61 +210,77 @@ public class TelaCadastramento extends Application implements LubrificanteSeleci
     }
 
     private VBox criarLayoutPonto(int pontoNumero) {
-        Label labelSetor = new Label("Setor: " + ponto.getSetor());
-        Label labelEquipamento = new Label("Equipamento: " + ponto.getEquipamento());
+
+
+        Label labelSetor = new Label("Setor: " + pontoLubrificacao.getSetor());
+        Label labelEquipamento = new Label("Equipamento: " + pontoLubrificacao.getEquipamento());
         labelSetor.setStyle("-fx-font-size: 15;");
         labelEquipamento.setStyle("-fx-font-size: 15;");
 
-        Label labelPonto = new Label("Ponto " + pontoNumero + ":");
+        Label labelPonto = new Label("PontoLubrificacao " + pontoNumero + ":");
         labelPonto.setStyle("-fx-font-size: 17; -fx-font-weight: bold;");
 
         TextField inputPonto = new TextField();
 
-        Label labelTagPonto = new Label("Tag do Ponto:");
+        Label labelTagPonto = new Label("Tag do PontoLubrificacao:");
         TextField inputTagPonto = new TextField();
-        inputsTagPonto.add(inputTagPonto);
 
         Label labelLubrificante = new Label("Lubrificante Total:");
         TextField inputLubrificante = new TextField();
-        inputLubrificante.setEditable(false);
-        inputsLubrificante.add(inputLubrificante);
 
         Label labelQuantidade = new Label("Quantidade:");
         TextField inputQuantidade = new TextField();
-        inputsQuantidadeLubrificante.add(inputQuantidade);
+        String quantidadeText = inputQuantidade.getText();
+//        int quantidade = 0;
+//        if (quantidadeText.matches("-?\\b\\d+\\b")) { // Verifica se o texto contém apenas dígitos
+//            quantidade = Integer.parseInt(quantidadeText);
+//            pontoLubrificacao.setQuantidadeDeLubrificante(quantidade);
+//        } else {
+//            exibirAlerta("Somente inteiros permitidos");
+//        }
+
 
         Label labelDataHoraLubrificacao = new Label("Data e Hora Lubrificação:");
         DatePicker datePicker = new DatePicker();
-        inputsDataLubrificacao.add(datePicker);
+
+
 
         Label labelProximaDataLubrificacao = new Label("Próxima Data Lubrificação:");
         DatePicker proximaDatePicker = new DatePicker();
-        inputsProximaDataLubrificacao.add(proximaDatePicker);
+        LocalDate proximaData = proximaDatePicker.getValue();
+
 
         Label labelQuantidadeGraxa = new Label("Quantidade de Graxa:");
         TextField inputQuantidadeGraxa = new TextField();
-        inputsQuantidadeGraxa.add(inputQuantidadeGraxa);
+        String quantidadeText2 = inputQuantidadeGraxa.getText();
+//        int quantidadeGraxa = 0;
+//        if (quantidadeText.matches("-?\\b\\d+\\b")) { // Verifica se o texto contém apenas dígitos
+//            quantidadeGraxa = Integer.parseInt(quantidadeText2);
+//        } else {
+//            exibirAlerta("Somente inteiros permitidos");
+//        }
+
 
         Label labelComponentesEquipamento = new Label("Componentes do Equipamento:");
         TextField inputComponentesEquipamento = new TextField();
-        inputsComponentesEquipamento.add(inputComponentesEquipamento);
 
         Label labelOperacao = new Label("Operação:");
         TextField inputOperacao = new TextField();
-        inputsOperacao.add(inputOperacao);
 
         Label labelObservacoes = new Label("Observações:");
         TextField inputObservacoes = new TextField();
         inputObservacoes.setPromptText("Adicione observações, se necessário");
-        inputsObservacoes.add(inputObservacoes);
 
-        ComboBox<String> comboBoxUnidade = new ComboBox<>();
-        comboBoxUnidade.getItems().addAll("Gramas", "Litros");
-        comboBoxUnidade.setValue("Gramas");
+
+
+        ComboBox<UnidadeMedida> comboBoxUnidade = new ComboBox<>();
+        comboBoxUnidade.getItems().addAll(UnidadeMedida.values());
+        comboBoxUnidade.setValue(UnidadeMedida.GRAMAS);
 
         Button selecionarLubrificanteButton = new Button("Selecionar Lubrificante");
         selecionarLubrificanteButton.setStyle("-fx-background-color: #4caf50; -fx-text-fill: white;");
         selecionarLubrificanteButton.setOnAction(event -> processarSelecaoLubrificante(pontoNumero));
+
 
         VBox pontoLayout = new VBox(10);
         pontoLayout.setStyle("-fx-background-color: #f9f9f9; -fx-padding: 10px; -fx-border-color: #000000; -fx-border-width: 1px; -fx-border-radius: 5px;");
@@ -280,138 +302,126 @@ public class TelaCadastramento extends Application implements LubrificanteSeleci
         return pontoLayout;
     }
 
-    private void processarCadastro(Stage primaryStage) {
+    private void processarCadastro(Stage primaryStage, int quantidadePontos) {
         if (pontosLubrificacao.isEmpty()) {
             exibirAlerta("Insira pelo menos um ponto de lubrificação.");
         } else {
-            for (int i = 0; i < pontosLubrificacao.size(); i++) {
-                Ponto pontoString = pontosLubrificacao.get(i);
-                LocalDateTime dataLubrificacao = null;
+            for (int i = 0; i < quantidadePontos; i++) {
+                TextField inputPonto  = (TextField) pontoLayout.getChildren().get(1);
+                pontosLubrificacao.get(i).setPonto(inputPonto.getText());
+                TextField inputTag  = (TextField) pontoLayout.getChildren().get(5);
+                pontosLubrificacao.get(i).setTag(inputTag.getText());
+                TextField inputQtdLub  = (TextField) pontoLayout.getChildren().get(9);
+                pontosLubrificacao.get(i).setQuantidadeDeLubrificante(Integer.parseInt(inputQtdLub.getText()));
+                TextField inputQtdGraxa  = (TextField) pontoLayout.getChildren().get(15);
+                pontosLubrificacao.get(i).setQuantidadeDeGraxa(Integer.parseInt(inputQtdGraxa.getText()));
+                TextField inputComp  = (TextField) pontoLayout.getChildren().get(17);
+                pontosLubrificacao.get(i).setComponentes(inputComp.getText());
+                TextField inputOp  = (TextField) pontoLayout.getChildren().get(19);
+                pontosLubrificacao.get(i).setOperacao(inputOp.getText());
+                TextField inputObs  = (TextField) pontoLayout.getChildren().get(21);
+                pontosLubrificacao.get(i).setObs(inputObs.getText());
+                DatePicker dataLub = (DatePicker) pontoLayout.getChildren().get(11);
+                pontosLubrificacao.get(i).setDataHoraLubrificacao(dataLub.getValue());
+                DatePicker dataProx = (DatePicker) pontoLayout.getChildren().get(13);
+                pontosLubrificacao.get(i).setDataProxLubrificacao(dataProx.getValue());
 
-                if (inputsDataLubrificacao.get(i) instanceof DatePicker) {
-                    DatePicker datePicker = (DatePicker) inputsDataLubrificacao.get(i);
-                    dataLubrificacao = datePicker.getValue().atStartOfDay();
-                }
-
-                LocalDateTime proximaDataLubrificacao = null;
-                if (inputsProximaDataLubrificacao.get(i) instanceof DatePicker) {
-                    DatePicker proximaDatePicker = (DatePicker) inputsProximaDataLubrificacao.get(i);
-                    proximaDataLubrificacao = proximaDatePicker.getValue().atStartOfDay();
-                }
-
-                String quantidadeGraxa = inputsQuantidadeGraxa.get(i).getText();
-                String componentesEquipamento = inputsComponentesEquipamento.get(i).getText();
-                String operacao = inputsOperacao.get(i).getText();
-
-                // Recuperando observações do campo correspondente
-                String observacoes = inputsObservacoes.get(i).getText();
-
-                if (lubrificante != null) {
-                    try {
-                        LocalDateTime dataProximaTroca = proximaDataLubrificacao.plusDays(INTERVALO_LUBRIFICACAO_DIAS);
-                        datasProximaTrocaLubrificante.add(dataProximaTroca);
-                    } catch (Exception e) {
-                        exibirAlerta("Insira uma data válida para a próxima lubrificação.");
-                        return;
-                    }
-
-//                    pontosLubrificacao.add("Setor: " + setor + ", Equipamento: " + equipamento + ", Ponto: " + inputsLubrificante.get(i).getText() +
-//                            ", Tag: " + inputsTagPonto.get(i).getText() +
-//                            ", Lubrificante: " + lubrificante.getCodigo() +
-//                            ", Quantidade: " + inputsQuantidadeLubrificante.get(i).getText() + " " + "Gramas" +
-//                            ", Data e Hora Lubrificação: " + dataLubrificacao +
-//                            ", Próxima Data Lubrificação: " + proximaDataLubrificacao +
-//                            ", Quantidade de Graxa: " + quantidadeGraxa +
-//                            ", Componentes do Equipamento: " + componentesEquipamento +
-//                            ", Operação: " + operacao +
-//                            ", Observações: " + observacoes);
-                } else {
-                    exibirAlerta("Selecione um lubrificante antes de cadastrar.");
-                }
+//                if (lubrificante != null) {
+//                    try {
+//                        LocalDate dataProximaTroca = pontosLubrificacao.get(i).getDataProxLubrificacao().plusDays(INTERVALO_LUBRIFICACAO_DIAS);
+//                        datasProximaTrocaLubrificante.add(LocalDateTime.from(dataProximaTroca));
+//                    } catch (Exception e) {
+//                        exibirAlerta("Insira uma data válida para a próxima lubrificação.");
+//                        return;
+//                    }
+//                    Entidade<Object> dao = new HibernateEntidade<>();
+//
+//                    try {
+//                        dao.salvarAdicional(Collections.singletonList(pontosLubrificacao));
+//                        Alert alert = new Alert((Alert.AlertType.INFORMATION));
+//                        alert.setTitle("Sucesso");
+//                        alert.setContentText("PontoLubrificacao Cadastrado com sucesso");
+//                        alert.show();
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//                } else {
+//                    exibirAlerta("Selecione um lubrificante antes de cadastrar.");
+//                }
             }
             mostrarMensagemCadastro();
             adicionarBotaoVoltar(primaryStage);
             verificarProximidadeTrocaLubrificante();
         }
-    }
+        }
 
-    private void adicionarBotaoVoltar(Stage primaryStage) {
-        Button voltarButton = new Button("Voltar");
-        voltarButton.setStyle("-fx-background-color: #757575; -fx-text-fill: white;");
-        voltarButton.setOnAction(event -> {
-            if (onCadastroConcluido != null) {
-                onCadastroConcluido.accept(primaryStage);
-            }
-            datasLubrificacao.clear();
-        });
+        private void adicionarBotaoVoltar(Stage primaryStage) {
+            Button voltarButton = new Button("Voltar");
+            voltarButton.setStyle("-fx-background-color: #757575; -fx-text-fill: white;");
+            voltarButton.setOnAction(event -> {
+                if (onCadastroConcluido != null) {
+                    onCadastroConcluido.accept(primaryStage);
+                }
+                datasLubrificacao.clear();
+            });
 
-        layout.getChildren().add(voltarButton);
-    }
+            layout.getChildren().add(voltarButton);
+        }
 
-    private void processarSelecaoLubrificante(int pontoNumero) {
-        int index = pontoNumero - 1;
-        TelaPesquisaLubrificantes telaPesquisa = new TelaPesquisaLubrificantes(
-                this,
-                inputsLubrificante.get(index)
-        );
-        Stage stagePesquisa = new Stage();
-        telaPesquisa.setLubrificanteSelecionadoListener(lubrificanteSelecionado -> {
-            inputsLubrificante.get(index).setText(lubrificanteSelecionado.getDescricao());
-            inputsQuantidadeLubrificante.get(index).setText("1");
-//            pontosLubrificacao.add("Setor: " + setor + ", Equipamento: " + equipamento + ", Ponto: " + inputsLubrificante.get(index).getText() +
-//                    ", Tag: " + inputsTagPonto.get(index).getText() +
-//                    ", Lubrificante: " + lubrificanteSelecionado.getCodigo() +
-//                    ", Quantidade: 1 " + "Gramas" +
-//                    ", Data e Hora Lubrificação: " + inputsDataLubrificacao.get(index).getValue() +
-//                    ", Próxima Data Lubrificação: " + inputsProximaDataLubrificacao.get(index).getValue() +
-//                    ", Quantidade de Graxa: " + inputsQuantidadeGraxa.get(index).getText() +
-//                    ", Componentes do Equipamento: " + inputsComponentesEquipamento.get(index).getText() +
-//                    ", Operação: " + inputsOperacao.get(index).getText() +
-//                    ", Observações: " + inputsObservacoes.get(index).getText());
-        });
-        telaPesquisa.start(stagePesquisa);
-    }
+        private void processarSelecaoLubrificante(int pontoNumero) {
+            int index = pontoNumero - 1;
+            TelaPesquisaLubrificantes telaPesquisa = new TelaPesquisaLubrificantes(
+                    this,
+                    lubrificantes.get(index)
+            );
+            Stage stagePesquisa = new Stage();
+            telaPesquisa.setLubrificanteSelecionadoListener(lubrificanteSelecionado -> {
+                lubrificantes.get(index).setText(lubrificanteSelecionado.getDescricao());
+                inputsQuantidadeLubrificante.get(index).setText("1");
+            });
+            telaPesquisa.start(stagePesquisa);
+        }
 
-    private void mostrarMensagemCadastro() {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Sucesso");
-        alert.setHeaderText(null);
-        alert.setContentText("Pontos cadastrados com sucesso!");
-        alert.show();
-    }
+        private void mostrarMensagemCadastro() {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Sucesso");
+            alert.setHeaderText(null);
+            alert.setContentText("Pontos cadastrados com sucesso!");
+            alert.show();
+        }
 
-    private void exibirAlerta(String mensagem) {
-        Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setTitle("Aviso");
-        alert.setHeaderText(null);
-        alert.setContentText(mensagem);
-        alert.show();
-    }
+        private void exibirAlerta(String mensagem) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Aviso");
+            alert.setHeaderText(null);
+            alert.setContentText(mensagem);
+            alert.show();
+        }
 
-    private void verificarProximidadeTrocaLubrificante() {
-        LocalDateTime dataAtual = LocalDateTime.now();
-        Notifications notificationBuilder = Notifications.create()
-                .title("Próximas Trocas de Lubrificante")
-                .hideAfter(Duration.seconds(10))
-                .position(Pos.TOP_RIGHT);
+        private void verificarProximidadeTrocaLubrificante() {
+            LocalDateTime dataAtual = LocalDateTime.now();
+            Notifications notificationBuilder = Notifications.create()
+                    .title("Próximas Trocas de Lubrificante")
+                    .hideAfter(Duration.seconds(10))
+                    .position(Pos.TOP_RIGHT);
 
-        for (int i = 0; i < datasProximaTrocaLubrificante.size(); i++) {
-            LocalDateTime dataProximaTroca = datasProximaTrocaLubrificante.get(i);
+            for (int i = 0; i < datasProximaTrocaLubrificante.size(); i++) {
+                LocalDateTime dataProximaTroca = datasProximaTrocaLubrificante.get(i);
 
-            long diasRestantes = ChronoUnit.DAYS.between(dataAtual, dataProximaTroca);
-            if (diasRestantes <= 7) {
-                notificationBuilder.text("Ponto " + (i + 1) + ": Faltam " + diasRestantes + " dias para a próxima troca de lubrificante.");
-                notificationBuilder.showWarning();
+                long diasRestantes = ChronoUnit.DAYS.between(dataAtual, dataProximaTroca);
+                if (diasRestantes <= 7) {
+                    notificationBuilder.text("PontoLubrificacao " + (i + 1) + ": Faltam " + diasRestantes + " dias para a próxima troca de lubrificante.");
+                    notificationBuilder.showWarning();
+                }
             }
         }
-    }
 
-    @Override
-    public void onLubrificanteSelecionado(Lubrificante lubrificanteSelecionado) {
-        this.lubrificante = lubrificanteSelecionado;
-    }
+        @Override
+        public void onLubrificanteSelecionado(Lubrificante lubrificanteSelecionado) {
+            this.lubrificante = lubrificanteSelecionado;
+        }
 
-    public static void main(String[] args) {
-        launch(args);
+        public static void main(String[] args) {
+            launch(args);
+        }
     }
-}

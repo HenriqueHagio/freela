@@ -1,13 +1,13 @@
 package com.example.demo.Cadastro.Constante;
 
-public enum Quantidade {
+public enum UnidadeMedida {
     GRAMAS("Gramas"),
     LITROS("Litros");
 
     private String descricao;
 
     // Constructor
-    Quantidade(String descricao) {
+    UnidadeMedida(String descricao) {
         this.descricao = descricao;
     }
 

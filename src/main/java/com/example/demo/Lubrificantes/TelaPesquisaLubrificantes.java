@@ -2,6 +2,7 @@ package com.example.demo.Lubrificantes;
 
 import com.example.demo.Estoque.LeitorExcel;
 import javafx.application.Application;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
@@ -17,9 +18,9 @@ public class TelaPesquisaLubrificantes extends Application {
 
     private List<Lubrificante> listaLubrificantes;
     private LubrificanteSelecionadoListener listener;
-    private TextField inputLubrificante;
+    private Lubrificante inputLubrificante;
 
-    public TelaPesquisaLubrificantes(LubrificanteSelecionadoListener listener, TextField inputLubrificante) {
+    public TelaPesquisaLubrificantes(LubrificanteSelecionadoListener listener, Lubrificante inputLubrificante) {
         this.listener = listener;
         this.inputLubrificante = inputLubrificante;
     }
@@ -36,10 +37,10 @@ public class TelaPesquisaLubrificantes extends Application {
             TableView<Lubrificante> table = new TableView<>();
 
             TableColumn<Lubrificante, String> codigoColumn = new TableColumn<>("Código");
-            codigoColumn.setCellValueFactory(cellData -> cellData.getValue().codigoProperty());
+            codigoColumn.setCellValueFactory(cellData -> (ObservableValue<String>) cellData.getValue());
 
             TableColumn<Lubrificante, String> descricaoColumn = new TableColumn<>("Descrição");
-            descricaoColumn.setCellValueFactory(cellData -> cellData.getValue().descricaoProperty());
+            descricaoColumn.setCellValueFactory(cellData -> (ObservableValue<String>) cellData.getValue());
 
             table.getColumns().addAll(codigoColumn, descricaoColumn);
 

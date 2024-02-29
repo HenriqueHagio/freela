@@ -48,11 +48,11 @@ public class LeitorExcel {
                 Row row = rowIterator.next();
 
                 Cell codigoCell = row.getCell(0);
-                String codigo;
+                int codigo;
                 if (codigoCell.getCellType() == CellType.NUMERIC) {
-                    codigo = String.valueOf((int) codigoCell.getNumericCellValue());
+                    codigo = (int) codigoCell.getNumericCellValue();
                 } else {
-                    codigo = codigoCell.getStringCellValue();
+                    codigo = (int) codigoCell.getNumericCellValue();
                 }
 
                 Cell descricaoCell = row.getCell(1);

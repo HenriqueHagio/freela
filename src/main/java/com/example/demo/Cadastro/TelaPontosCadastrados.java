@@ -84,7 +84,7 @@ public class TelaPontosCadastrados extends Application {
     }
 
     public static void main(String[] args) {
-        List<String> pontos = List.of("Ponto A", "Ponto B", "Ponto C", "Ponto D", "Ponto E");
+        List<String> pontos = List.of("PontoLubrificacao A", "PontoLubrificacao B", "PontoLubrificacao C", "PontoLubrificacao D", "PontoLubrificacao E");
         launch(new TelaPontosCadastrados(pontos), args);
     }
 

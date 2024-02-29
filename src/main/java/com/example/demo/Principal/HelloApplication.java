@@ -191,12 +191,15 @@ public class HelloApplication extends Application {
 
         Button lubrificantesButton = criarBotao("Lubrificantes");
         lubrificantesButton.setOnAction(event -> {
-            TelaLubrificantes telaLubrificantes = new TelaLubrificantes();
             Stage lubrificantesStage = new Stage();
-
             // Substitua o caminho do arquivo conforme necessário
-            String filePath = "C:\\Users\\Lucas\\OneDrive\\Documentos\\Codigos Lubvel\\BD_PRODUTOS_LUBVEL.xlsx";
-            telaLubrificantes.start(lubrificantesStage, filePath);
+            String filePath = "D:\\freela\\src\\main\\resources\\com\\example\\demo\\comeco\\BD_PRODUTOS_LUBVEL.xlsx";
+
+            TelaLubrificantes telaLubrificantes = new TelaLubrificantes(lubrificantesStage, filePath);
+
+
+            telaLubrificantes.start();
+
         });
 
         Button estoqueButton = criarBotao("Estoque");

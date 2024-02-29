@@ -1,53 +1,60 @@
 package com.example.demo.Cadastro;
 
+import com.example.demo.Cadastro.Constante.UnidadeMedida;
+import com.example.demo.Lubrificantes.Lubrificante;
+import com.example.demo.comeco.Empresa;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+
+import javax.persistence.*;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.UUID;
+
+@Entity
+@Table(name = "pontoLubrificacao")
+@Getter
+@Setter
 public class PontoLubrificacao {
+    /**
+     * Chave primária em UUID
+     */
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @EqualsAndHashCode.Include
+    protected UUID codigo;
+
     private String setor;
-    private String equipamento;
-    private String tagEquipamento;
+
     private String ponto;
-    private String lubrificante;
 
-    public PontoLubrificacao() {
-    }
+    private String equipamento;
 
+    private String tag;
 
-    public String getSetor() {
-        return setor;
-    }
+    @ManyToOne
+    private Empresa empresa;
 
-    public void setSetor(String setor) {
-        this.setor = setor;
-    }
+    private LocalDate dataHoraLubrificacao;
 
-    public String getEquipamento() {
-        return equipamento;
-    }
+    private LocalDate dataProxLubrificacao;
 
-    public void setEquipamento(String equipamento) {
-        this.equipamento = equipamento;
-    }
+    private Integer quantidadeDeGraxa;
 
-    public String getTagEquipamento() {
-        return tagEquipamento;
-    }
+    private Integer quantidadeDeLubrificante;
 
-    public void setTagEquipamento(String tagEquipamento) {
-        this.tagEquipamento = tagEquipamento;
-    }
+    private UnidadeMedida unidadeMedida;
 
-    public String getPonto() {
-        return ponto;
-    }
+    @Column(name = "componentes do equipamento")
+    private String componentes;
 
-    public void setPonto(String ponto) {
-        this.ponto = ponto;
-    }
+    private String operacao;
 
-    public String getLubrificante() {
-        return lubrificante;
-    }
+    @Column(name = "observacaoes")
+    private String obs;
 
-    public void setLubrificante(String lubrificante) {
-        this.lubrificante = lubrificante;
-    }
+    @OneToMany
+    private List<Lubrificante> lubrificantes;
+
 }

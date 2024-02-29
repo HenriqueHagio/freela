@@ -2,7 +2,6 @@ module com.example.demo {
     requires javafx.controls;
     requires javafx.fxml;
     requires javafx.web;
-
     requires org.controlsfx.controls;
     requires com.dlsc.formsfx;
     requires net.synedra.validatorfx;
@@ -23,6 +22,7 @@ module com.example.demo {
     requires org.hibernate.orm.core;
     requires jbcrypt;
     requires java.mail;
+
 
 
     opens com.example.demo;
