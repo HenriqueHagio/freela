@@ -1,6 +1,5 @@
 package com.example.demo.comeco;
 
-import com.example.demo.Cadastro.TelaCadastramento;
 import com.example.demo.Cadastro.TelaPontosCadastrados;
 import com.example.demo.Estoque.TelaCadastroEstoque;
 import com.example.demo.Estoque.TelaEstoque;
@@ -95,9 +94,9 @@ public class TelaAdministrador extends Application {
     }
 
     private void abrirTelaCadastramento() {
-        TelaCadastramento telaCadastramento = new TelaCadastramento(stage -> primaryStage.show());
-        Stage cadastroPontosStage = new Stage();
-        telaCadastramento.start(cadastroPontosStage);
+//        TelaCadastramento telaCadastramento = new TelaCadastramento(stage -> primaryStage.show());
+//        Stage cadastroPontosStage = new Stage();
+//        telaCadastramento.start(cadastroPontosStage);
     }
 
     private void abrirTelaPontos() {
@@ -109,8 +108,7 @@ public class TelaAdministrador extends Application {
     private void abrirTelaLubrificantes() {
         Stage lubrificantesStage = new Stage();
         // Substitua o caminho do arquivo conforme necessário
-        String filePath = "C:\\Users\\Lucas\\OneDrive\\Documentos\\BD_PRODUTOS_LUBVEL.xlsx";
-        TelaLubrificantes telaLubrificantes = new TelaLubrificantes(lubrificantesStage, filePath);
+        TelaLubrificantes telaLubrificantes = new TelaLubrificantes(lubrificantesStage);
 
 
         telaLubrificantes.start();

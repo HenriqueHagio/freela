@@ -21,7 +21,7 @@ import org.mindrot.jbcrypt.BCrypt;
 import java.io.IOException;
 
 public class HelloApplication extends Application {
-
+    static Usuario usuario = new Usuario();
     private static TelaEstoque telaEstoque;
 
 
@@ -125,7 +125,7 @@ public class HelloApplication extends Application {
 
     private static boolean authenticate(String username, String password) {
         // Lógica para buscar informações do usuário (incluindo a senha criptografada) a partir do banco de dados
-        Usuario usuario = new Usuario();
+
         usuario = usuario.buscarUsuarioPorNome(username);
 
         // Verifica se o usuário foi encontrado e se a senha corresponde à senha armazenada no banco de dados
@@ -176,7 +176,7 @@ public class HelloApplication extends Application {
         Button cadastrarPontosButton = criarBotao("Cadastramento de Pontos");
         cadastrarPontosButton.setOnAction(event -> {
             // Exemplo: Voltando para o menu principal
-            TelaCadastramento telaCadastramento = new TelaCadastramento(t -> primaryStage.show());
+            TelaCadastramento telaCadastramento = new TelaCadastramento(t -> primaryStage.show(), usuario);
 
             Stage cadastroPontosStage = new Stage();
             telaCadastramento.start(cadastroPontosStage);
@@ -193,9 +193,9 @@ public class HelloApplication extends Application {
         lubrificantesButton.setOnAction(event -> {
             Stage lubrificantesStage = new Stage();
             // Substitua o caminho do arquivo conforme necessário
-            String filePath = "D:\\freela\\src\\main\\resources\\com\\example\\demo\\comeco\\BD_PRODUTOS_LUBVEL.xlsx";
+//            String filePath = "D:\\freela\\src\\main\\resources\\com\\example\\demo\\comeco\\BD_PRODUTOS_LUBVEL.xlsx";
 
-            TelaLubrificantes telaLubrificantes = new TelaLubrificantes(lubrificantesStage, filePath);
+            TelaLubrificantes telaLubrificantes = new TelaLubrificantes(lubrificantesStage);
 
 
             telaLubrificantes.start();

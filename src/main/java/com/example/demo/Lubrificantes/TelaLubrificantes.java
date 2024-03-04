@@ -21,11 +21,9 @@ import java.util.List;
 public class TelaLubrificantes extends Application {
 
     private Stage stage;
-    private String filePath;
 
-    public TelaLubrificantes(Stage stage, String filePath) {
+    public TelaLubrificantes(Stage stage) {
         this.stage = stage;
-        this.filePath = filePath;
     }
 
 

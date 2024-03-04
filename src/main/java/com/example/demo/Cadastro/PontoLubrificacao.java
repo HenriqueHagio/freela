@@ -9,7 +9,6 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -46,7 +45,7 @@ public class PontoLubrificacao {
 
     private UnidadeMedida unidadeMedida;
 
-    @Column(name = "componentes do equipamento")
+    @Column(name = "componentes_do_equipamento")
     private String componentes;
 
     private String operacao;
@@ -54,7 +53,7 @@ public class PontoLubrificacao {
     @Column(name = "observacaoes")
     private String obs;
 
-    @OneToMany
-    private List<Lubrificante> lubrificantes;
+    @ManyToOne
+    private Lubrificante lubrificante;
 
 }
