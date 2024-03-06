@@ -213,8 +213,6 @@ public class TelaCadastramento extends Application implements LubrificanteSeleci
     }
 
     private VBox criarLayoutPonto(int pontoNumero) {
-
-
         Label labelSetor = new Label("Setor: " + pontosLubrificacao.get(0).getSetor());
         Label labelEquipamento = new Label("Equipamento: " + pontosLubrificacao.get(0).getEquipamento());
         labelSetor.setStyle("-fx-font-size: 15;");
@@ -312,7 +310,6 @@ public class TelaCadastramento extends Application implements LubrificanteSeleci
             exibirAlerta("Insira pelo menos um ponto de lubrificação.");
         } else {
             for (int i = 0; i < quantidadePontos; i++) {
-
                 PontoLubrificacao ponto = pontosLubrificacao.get(i);
                 VBox layout = pontosLayout.get(i);
                 

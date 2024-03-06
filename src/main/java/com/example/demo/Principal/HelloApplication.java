@@ -184,7 +184,7 @@ public class HelloApplication extends Application {
 
         Button pontosButton = criarBotao("Pontos");
         pontosButton.setOnAction(event -> {
-            TelaPontosCadastrados telaPontos = new TelaPontosCadastrados();
+            TelaPontosCadastrados telaPontos = new TelaPontosCadastrados(usuario.getPessoa().getEmpresa());
             Stage pontosStage = new Stage();
             telaPontos.start(pontosStage);
         });
