@@ -17,6 +17,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -145,9 +147,11 @@ public class TelaPontosCadastrados extends Application {
 
         Label labelDataHoraLubrificacao = new Label("Data e Hora Lubrificação:");
         DatePicker datePicker = new DatePicker();
-        datePicker.setValue(ponto.getDataHoraLubrificacao());
+        datePicker.setValue(ponto.getDataHoraLubrificacao().toLocalDate());
         datePicker.setEditable(editavel);
-        ponto.setDataHoraLubrificacao(datePicker.getValue());
+        LocalTime horaAtual = LocalTime.now();
+        LocalDateTime dataHoraLub = LocalDateTime.of(datePicker.getValue(), horaAtual);
+        ponto.setDataHoraLubrificacao(dataHoraLub);
 
         Label labelProximaDataLubrificacao = new Label("Próxima Data Lubrificação:");
         DatePicker proximaDatePicker = new DatePicker();
@@ -192,7 +196,11 @@ public class TelaPontosCadastrados extends Application {
         });
         Button salvarButton = new Button("Salvar Alterações");
         salvarButton.setStyle("-fx-background-color: green; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;");
-        salvarButton.setOnAction(event -> salvar(ponto));
+        salvarButton.setOnAction(event -> {
+            salvar(ponto);
+            alerta();
+            detalhesStage.close();
+        });
 
         layout.getChildren().addAll(
                 labelPonto, inputPonto,
@@ -253,7 +261,6 @@ public class TelaPontosCadastrados extends Application {
     private void salvar(PontoLubrificacao ponto){
 
 
-
         TextField inputPonto  = (TextField) layout.getChildren().get(1);
         ponto.setPonto(inputPonto.getText());
 
@@ -280,10 +287,20 @@ public class TelaPontosCadastrados extends Application {
         ponto.setObs(inputObs.getText());
 
         DatePicker dataLub = (DatePicker) layout.getChildren().get(11);
-        ponto.setDataHoraLubrificacao(dataLub.getValue());
+        LocalTime horaAtual = LocalTime.now();
+        LocalDateTime dataHoraLub = LocalDateTime.of(dataLub.getValue(), horaAtual);
+        ponto.setDataHoraLubrificacao(dataHoraLub);
 
         DatePicker dataProx = (DatePicker) layout.getChildren().get(13);
         ponto.setDataProxLubrificacao(dataProx.getValue());
         dao.atualizar(ponto);
+
+    }
+    public void alerta(){
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Sucesso");
+        alert.setHeaderText(null);
+        alert.setContentText("Ponto atualizado com sucesso!");
+        alert.show();
     }
 }

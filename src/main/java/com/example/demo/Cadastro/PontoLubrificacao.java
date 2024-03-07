@@ -13,6 +13,7 @@ import org.hibernate.criterion.Restrictions;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -40,7 +41,7 @@ public class PontoLubrificacao {
     @ManyToOne
     private Empresa empresa;
 
-    private LocalDate dataHoraLubrificacao;
+    private LocalDateTime dataHoraLubrificacao;
 
     private LocalDate dataProxLubrificacao;
 

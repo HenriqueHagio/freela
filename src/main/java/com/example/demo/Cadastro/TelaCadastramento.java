@@ -23,6 +23,7 @@ import org.controlsfx.control.Notifications;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,17 +33,19 @@ public class TelaCadastramento extends Application implements LubrificanteSeleci
     private Usuario usuario;
 
     private VBox layout;
+
     private final List<PontoLubrificacao> pontosLubrificacao = new ArrayList<>();
-
-
 
     private Lubrificante lubrificante = new Lubrificante();
 
     private Lubrificante lubrificanteSalvar = new Lubrificante();
 
     private final List<Lubrificante> lubrificantes = lubrificante.recuperarTodos();
+
     private Consumer<Stage> onCadastroConcluido;
-    private final List<LocalDateTime> datasProximaTrocaLubrificante = new ArrayList<>();
+
+
+
     private final List<LocalDateTime> datasLubrificacao = new ArrayList<>();
 
     private static final int INTERVALO_LUBRIFICACAO_DIAS = 30;
@@ -52,6 +55,9 @@ public class TelaCadastramento extends Application implements LubrificanteSeleci
     private VBox pontoLayout;  
     
     private List<VBox> pontosLayout = new ArrayList<>();
+
+    private List<LocalDateTime> datasProximaTrocaLubrificante = new ArrayList<>();
+
 
 
     public TelaCadastramento(Consumer<Stage> onCadastroConcluido, Usuario usuario) {
@@ -153,7 +159,6 @@ public class TelaCadastramento extends Application implements LubrificanteSeleci
 
     private void configurarTelaCadastroPontos(Stage primaryStage, int quantidadePontos) {
         layout.getChildren().clear();
-        datasProximaTrocaLubrificante.clear();
 
         Label setorLabel = new Label("Setor: " + pontosLubrificacao.get(0).getSetor());
         Label equipamentoLabel = new Label("Equipamento: " + pontosLubrificacao.get(0).getEquipamento());
@@ -339,35 +344,27 @@ public class TelaCadastramento extends Application implements LubrificanteSeleci
                 ponto.setObs(inputObs.getText());
 
                 DatePicker dataLub = (DatePicker) layout.getChildren().get(11);
-                ponto.setDataHoraLubrificacao(dataLub.getValue());
+                LocalTime horaAtual = LocalTime.now();
+                LocalDateTime dataHoraLub = LocalDateTime.of(dataLub.getValue(), horaAtual);
+                ponto.setDataHoraLubrificacao(dataHoraLub);
 
                 DatePicker dataProx = (DatePicker) layout.getChildren().get(13);
                 ponto.setDataProxLubrificacao(dataProx.getValue());
 
 
                 ponto.setLubrificante(lubrificanteSalvar);
-//                if (lubrificante != null) {
-//                    try {
-//                        LocalDate dataProximaTroca = ponto.getDataProxLubrificacao().plusDays(INTERVALO_LUBRIFICACAO_DIAS);
-//                        datasProximaTrocaLubrificante.add(LocalDateTime.from(dataProximaTroca));
-//                    } catch (Exception e) {
-//                        exibirAlerta("Insira uma data válida para a próxima lubrificação.");
-//                        return;
-//                    }
-//                    Entidade<Object> dao = new HibernateEntidade<>();
-//
-//                    try {
-//                        dao.salvarAdicional(Collections.singletonList(pontosLubrificacao));
-//                        Alert alert = new Alert((Alert.AlertType.INFORMATION));
-//                        alert.setTitle("Sucesso");
-//                        alert.setContentText("PontoLubrificacao Cadastrado com sucesso");
-//                        alert.show();
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                    }
-//                } else {
-//                    exibirAlerta("Selecione um lubrificante antes de cadastrar.");
-//                }
+                if (lubrificante != null) {
+                    try {
+                        LocalDate dataProximaTroca = ponto.getDataProxLubrificacao().plusDays(INTERVALO_LUBRIFICACAO_DIAS);
+                        datasProximaTrocaLubrificante.add(LocalDateTime.from(dataProximaTroca));
+                    } catch (Exception e) {
+                        exibirAlerta("Insira uma data válida para a próxima lubrificação.");
+                        return;
+                    }
+
+                } else {
+                    exibirAlerta("Selecione um lubrificante antes de cadastrar.");
+                }
             }
             mostrarMensagemCadastro();
             adicionarBotaoVoltar(primaryStage);
@@ -382,7 +379,7 @@ public class TelaCadastramento extends Application implements LubrificanteSeleci
             if (onCadastroConcluido != null) {
                 onCadastroConcluido.accept(primaryStage);
             }
-            datasLubrificacao.clear();
+            primaryStage.close();
         });
 
         layout.getChildren().add(voltarButton);
@@ -431,13 +428,10 @@ public class TelaCadastramento extends Application implements LubrificanteSeleci
                 .title("Próximas Trocas de Lubrificante")
                 .hideAfter(Duration.seconds(10))
                 .position(Pos.TOP_RIGHT);
-
-        for (int i = 0; i < datasProximaTrocaLubrificante.size(); i++) {
-            LocalDateTime dataProximaTroca = datasProximaTrocaLubrificante.get(i);
-
+        for (LocalDateTime dataProximaTroca : datasProximaTrocaLubrificante) {
             long diasRestantes = ChronoUnit.DAYS.between(dataAtual, dataProximaTroca);
             if (diasRestantes <= 7) {
-                notificationBuilder.text("PontoLubrificacao " + (i + 1) + ": Faltam " + diasRestantes + " dias para a próxima troca de lubrificante.");
+                notificationBuilder.text("PontoLubrificacao: Faltam " + diasRestantes + " dias para a próxima troca de lubrificante.");
                 notificationBuilder.showWarning();
             }
         }
