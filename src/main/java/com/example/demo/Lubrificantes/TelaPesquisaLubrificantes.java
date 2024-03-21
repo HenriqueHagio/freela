@@ -1,6 +1,7 @@
 package com.example.demo.Lubrificantes;
 
 import com.example.demo.Estoque.LeitorExcel;
+import com.example.demo.comeco.Empresa;
 import javafx.application.Application;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -19,10 +20,12 @@ public class TelaPesquisaLubrificantes extends Application {
     private List<Lubrificante> listaLubrificantes;
     private LubrificanteSelecionadoListener listener;
     private Lubrificante inputLubrificante;
+    private Empresa empresa;
 
-    public TelaPesquisaLubrificantes(LubrificanteSelecionadoListener listener, Lubrificante inputLubrificante) {
+    public TelaPesquisaLubrificantes(LubrificanteSelecionadoListener listener, Lubrificante inputLubrificante, Empresa empresa) {
         this.listener = listener;
         this.inputLubrificante = inputLubrificante;
+        this.empresa = empresa;
     }
 
     public static void main(String[] args) {
@@ -31,7 +34,7 @@ public class TelaPesquisaLubrificantes extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        listaLubrificantes = LeitorExcel.getListaLubrificantes();
+        listaLubrificantes = LeitorExcel.getListaLubrificantes(empresa);
 
         if (listaLubrificantes != null) {
             TableView<Lubrificante> table = new TableView<>();

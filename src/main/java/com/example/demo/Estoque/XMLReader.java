@@ -36,7 +36,7 @@ public class XMLReader {
                     double quantidade = Double.parseDouble(elemento.getElementsByTagName("qCom").item(0).getTextContent());
                     String unidade = elemento.getElementsByTagName("uCom").item(0).getTextContent();
 
-                    ItemEstoque item = new ItemEstoque(nome, (int) quantidade, unidade);
+                    ItemEstoque item = new ItemEstoque(nome, quantidade, unidade);
                     itens.add(item);
                 }
             }

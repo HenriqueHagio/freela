@@ -41,7 +41,7 @@ public class TelaAdministrador extends Application {
         adminLayout.setPadding(new Insets(20));
 
         // Adicionando um ImageView para um ícone ou logotipo
-        ImageView logoImageView = new ImageView(new Image("C:\\Users\\Lucas\\OneDrive\\Documentos\\Codigos Lubvel\\demo (2)\\src\\main\\java\\com\\example\\demo\\Principal\\img.png"));
+        ImageView logoImageView = new ImageView(new Image("file:src/main/java/com/example/demo/Principal/img.png"));
         logoImageView.setFitHeight(50);  // Ajuste a altura conforme necessário
         logoImageView.setPreserveRatio(true);
 
@@ -121,7 +121,7 @@ public class TelaAdministrador extends Application {
     }
 
     private void abrirTelaCadastroEstoque() throws IOException, InvalidFormatException {
-        TelaCadastroEstoque telaCadastroEstoque = new TelaCadastroEstoque();
+        TelaCadastroEstoque telaCadastroEstoque = new TelaCadastroEstoque(new Usuario());
         Stage cadastroEstoqueStage = new Stage();
         telaCadastroEstoque.start(cadastroEstoqueStage);
     }

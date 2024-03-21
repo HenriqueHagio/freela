@@ -1,7 +1,9 @@
 package com.example.demo.Estoque;
 
 import com.example.demo.Lubrificantes.Lubrificante;
+import com.example.demo.comeco.Empresa;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class LeitorExcel {
@@ -10,7 +12,11 @@ public class LeitorExcel {
 
     private static Lubrificante lubrificante = new Lubrificante();
 
+    private static Produto produto = new Produto();
+
     static List<Lubrificante> listaLubrificantes = lubrificante.recuperarTodos();
+
+    static List<Lubrificante> listaLubrificantesEmpresa = new ArrayList<>();
 
 
     public LeitorExcel(String descricao) {
@@ -59,7 +65,8 @@ public class LeitorExcel {
 //        return listaLubrificantes;
 //    }
 
-    public static List<Lubrificante> getListaLubrificantes() {
-        return listaLubrificantes;
+    public static List<Lubrificante> getListaLubrificantes(Empresa empresa) {
+        listaLubrificantesEmpresa = produto.recuperarLubrificantePorEmpresa(empresa);
+        return listaLubrificantesEmpresa;
     }
 }

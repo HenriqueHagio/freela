@@ -102,11 +102,13 @@ public class TelaCriarNovoUsuario {
         usuario.setUsername(username);
         usuario.setPassword(senhaHash);
         usuario.setPessoa(pessoa);
+        usuario.setRole("comum");
 
 
         try {
 
             dao.salvar(pessoa);
+            usuario.setRole("comum");
             dao.salvar(usuario);
             Alert alert = new Alert((Alert.AlertType.INFORMATION));
             alert.setTitle("Sucesso");

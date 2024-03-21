@@ -5,6 +5,8 @@ import com.example.demo.Hibernate.Entidade;
 import com.example.demo.Hibernate.HibernateEntidade;
 import com.example.demo.comeco.Empresa;
 import javafx.application.Application;
+import javafx.collections.FXCollections;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
@@ -46,6 +48,36 @@ public class TelaPontosCadastrados extends Application {
     }
 
     public TelaPontosCadastrados() {
+
+    }
+
+    public void telaAdm(Stage primaryStage){
+        Label labelEmpresa = new Label("Selecione a empresa:");
+        ComboBox<String> comboBoxEmpresa = new ComboBox<>();
+        List<Empresa> empresas = new Empresa().recuperarTodos();
+        List<String> ls = new ArrayList<>();
+        for(Empresa l : empresas){
+            ls.add(l.getNome());
+            comboBoxEmpresa.setItems(FXCollections.observableArrayList(ls));
+        }
+        comboBoxEmpresa.getItems().addAll();
+
+        comboBoxEmpresa.setOnAction(event -> {
+            String selectedItem = comboBoxEmpresa.getSelectionModel().getSelectedItem();
+            Empresa empresaAdmin = new Empresa().buscarPessoaPorNome(selectedItem);
+            TelaPontosCadastrados telaPontos = new TelaPontosCadastrados(empresaAdmin);
+            Stage pontosStage = new Stage();
+            telaPontos.start(pontosStage);
+            primaryStage.close();
+        });
+        VBox root = new VBox(10);
+        root.setPadding(new Insets(10));
+        root.getChildren().addAll(labelEmpresa,comboBoxEmpresa);
+        Scene scene = new Scene(root, 300, 200);
+        primaryStage.setTitle("Selecionar empresa");
+        primaryStage.setScene(scene);
+        primaryStage.show();
+
 
     }
 
@@ -135,15 +167,15 @@ public class TelaPontosCadastrados extends Application {
 
         Label labelQuantidade = new Label("Quantidade:");
         TextField inputQuantidade = new TextField();
-        inputQuantidade.setText(ponto.getQuantidadeDeLubrificante().toString());
+//        inputQuantidade.setText(ponto.getQuantidadeDeLubrificante().toString());
         inputQuantidade.setEditable(editavel);
-        ponto.setQuantidadeDeLubrificante(Integer.parseInt(inputQuantidade.getText()));
+//        ponto.setQuantidadeDeLubrificante(Integer.parseInt(inputQuantidade.getText()));
 
         ComboBox<UnidadeMedida> comboBoxUnidade = new ComboBox<>();
         comboBoxUnidade.getItems().addAll(UnidadeMedida.values());
-        comboBoxUnidade.setValue(ponto.getUnidadeMedida());
+//        comboBoxUnidade.setValue(ponto.getUnidadeMedida());
         comboBoxUnidade.setEditable(editavel);
-        ponto.setUnidadeMedida(comboBoxUnidade.getValue());
+//        ponto.setUnidadeMedida(comboBoxUnidade.getValue());
 
         Label labelDataHoraLubrificacao = new Label("Data e Hora Lubrificação:");
         DatePicker datePicker = new DatePicker();
@@ -269,10 +301,10 @@ public class TelaPontosCadastrados extends Application {
 
         HBox caixa  = (HBox) layout.getChildren().get(9);
         TextField inputQtdLub  = (TextField) caixa.getChildren().get(0);
-        ponto.setQuantidadeDeLubrificante(Integer.parseInt(inputQtdLub.getText()));
+//        ponto.setQuantidadeDeLubrificante(Integer.parseInt(inputQtdLub.getText()));
 
         ComboBox<UnidadeMedida> comboBoxUnidade = (ComboBox<UnidadeMedida>) caixa.getChildren().get(1);
-        ponto.setUnidadeMedida(comboBoxUnidade.getValue());
+//        ponto.setUnidadeMedida(comboBoxUnidade.getValue());
 
         TextField inputQtdGraxa  = (TextField) layout.getChildren().get(15);
         ponto.setQuantidadeDeGraxa(Integer.parseInt(inputQtdGraxa.getText()));

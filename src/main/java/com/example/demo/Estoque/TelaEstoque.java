@@ -25,7 +25,7 @@ public class TelaEstoque {
     }
 
     private void initializeTable() {
-//        if (table != null) {
+        if (table != null) {
             TableColumn<ItemEstoque, String> nomeColuna = new TableColumn<>("Nome do Produto");
             nomeColuna.setCellValueFactory(new PropertyValueFactory<>("nomeProduto"));
 
@@ -36,7 +36,7 @@ public class TelaEstoque {
             unidadeColuna.setCellValueFactory(new PropertyValueFactory<>("unidade"));
 
             table.getColumns().addAll(nomeColuna, quantidadeColuna, unidadeColuna);
-//        }
+        }
     }
 
     public void atualizarEstoque(List<ItemEstoque> itens) {

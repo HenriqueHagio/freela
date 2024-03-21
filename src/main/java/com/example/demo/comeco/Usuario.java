@@ -1,6 +1,7 @@
 package com.example.demo.comeco;
 
 import com.example.demo.Hibernate.HibernateUtil;
+import javafx.collections.ObservableList;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -57,6 +58,14 @@ public class Usuario {
         Usuario usuario = (Usuario) criteria.uniqueResult();
         session.close();
        return usuario;
+    }
+
+    public ObservableList<Usuario> recuperarTodos() {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Criteria criteria = session.createCriteria(Usuario.class);
+        ObservableList<Usuario> usuarios = (ObservableList<Usuario>) criteria.list();
+        session.close();
+        return usuarios;
     }
 
     public void salvar() {

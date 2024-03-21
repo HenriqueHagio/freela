@@ -4,6 +4,7 @@ import com.example.demo.Cadastro.TelaCadastramento;
 import com.example.demo.Cadastro.TelaPontosCadastrados;
 import com.example.demo.Estoque.TelaCadastroEstoque;
 import com.example.demo.Estoque.TelaEstoque;
+import com.example.demo.Lubrificantes.TelaCadastrarLubrificantes;
 import com.example.demo.Lubrificantes.TelaLubrificantes;
 import com.example.demo.comeco.*;
 import javafx.application.Application;
@@ -68,11 +69,13 @@ public class HelloApplication extends Application {
 
 
             if (authenticate(username, password)) {
-                if (isAdmin(username)) {
-                    showAdminScreen(primaryStage, username);
-                } else {
-                    showMainMenu(primaryStage, username);
+                Usuario tipoUsuario = usuario.buscarUsuarioPorNome(username);
+                try {
+                    if (tipoUsuario.getRole() == "admin") {
+                        showAdminScreen(primaryStage, username);
+                    } else {showMainMenu(primaryStage, username);}
                 }
+                catch (Exception e) {}
             } else {
                 showError("Credenciais inválidas. Tente novamente.");
             }
@@ -186,14 +189,14 @@ public class HelloApplication extends Application {
         pontosButton.setOnAction(event -> {
             TelaPontosCadastrados telaPontos = new TelaPontosCadastrados(usuario.getPessoa().getEmpresa());
             Stage pontosStage = new Stage();
-            telaPontos.start(pontosStage);
+            if(!usuario.getRole().equals("admin"))
+                telaPontos.start(pontosStage);
+            else telaPontos.telaAdm(pontosStage);
         });
-
         Button lubrificantesButton = criarBotao("Lubrificantes");
         lubrificantesButton.setOnAction(event -> {
             Stage lubrificantesStage = new Stage();
-            // Substitua o caminho do arquivo conforme necessário
-//            String filePath = "D:\\freela\\src\\main\\resources\\com\\example\\demo\\comeco\\BD_PRODUTOS_LUBVEL.xlsx";
+
 
             TelaLubrificantes telaLubrificantes = new TelaLubrificantes(lubrificantesStage);
 
@@ -207,14 +210,11 @@ public class HelloApplication extends Application {
             telaEstoque = new TelaEstoque();
             Stage estoqueStage = new Stage();
             telaEstoque.start(estoqueStage);
+
         });
 
-        Button cadastroEstoqueButton = criarBotao("Cadastro de Estoque");
-        cadastroEstoqueButton.setOnAction(event -> {
-            TelaCadastroEstoque telaCadastroEstoque = new TelaCadastroEstoque();
-            Stage cadastroEstoqueStage = new Stage();
-            telaCadastroEstoque.start(cadastroEstoqueStage);
-        });
+
+
 
         VBox menuLayout = new VBox(20);
         menuLayout.setAlignment(Pos.CENTER);
@@ -224,9 +224,27 @@ public class HelloApplication extends Application {
                 cadastrarPontosButton,
                 pontosButton,
                 lubrificantesButton,
-                estoqueButton,
-                cadastroEstoqueButton
+                estoqueButton
         );
+        if(usuario.getRole().equals("admin")) {
+            Button cadastrarLubButton = criarBotao("Cadastrar Lubrificante");
+            cadastrarLubButton.setOnAction(event -> {
+                TelaCadastrarLubrificantes telaCadastrarLubrificantes = new TelaCadastrarLubrificantes();
+                Stage estoqueStage = new Stage();
+                telaCadastrarLubrificantes.start(estoqueStage);
+
+            });
+            menuLayout.getChildren().add(cadastrarLubButton);
+        }
+        if(usuario.getRole().equals("admin")){
+            Button cadastroEstoqueButton = criarBotao("Cadastro de Estoque");
+            cadastroEstoqueButton.setOnAction(event -> {
+            TelaCadastroEstoque telaCadastroEstoque = new TelaCadastroEstoque(usuario);
+            Stage cadastroEstoqueStage = new Stage();
+            telaCadastroEstoque.start(cadastroEstoqueStage);
+            });
+            menuLayout.getChildren().add(cadastroEstoqueButton);
+        }
 
         if (isAdmin(username)) {
             Button gerenciarUsuariosButton = criarBotao("Gerenciar Usuários");
@@ -234,7 +252,7 @@ public class HelloApplication extends Application {
             menuLayout.getChildren().add(gerenciarUsuariosButton);
         }
 
-        Scene mainScene = new Scene(menuLayout, 500, 400);
+        Scene mainScene = new Scene(menuLayout, 500, 500);
         primaryStage.setScene(mainScene);
     }
 

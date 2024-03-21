@@ -29,6 +29,7 @@ module com.example.demo {
     exports com.example.demo.Principal;
     exports com.example.demo.Cadastro;
     exports com.example.demo.Estoque;
+    opens com.example.demo.Estoque;
     opens com.example.demo.Cadastro;
     exports com.example.demo.Lubrificantes;
     opens com.example.demo.Lubrificantes;

@@ -1,13 +1,16 @@
 package com.example.demo.Cadastro;
 
 import com.example.demo.Cadastro.Constante.UnidadeMedida;
+import com.example.demo.Estoque.Produto;
 import com.example.demo.Hibernate.Entidade;
 import com.example.demo.Hibernate.HibernateEntidade;
 import com.example.demo.Lubrificantes.Lubrificante;
 import com.example.demo.Lubrificantes.LubrificanteSelecionadoListener;
 import com.example.demo.Lubrificantes.TelaPesquisaLubrificantes;
+import com.example.demo.comeco.Empresa;
 import com.example.demo.comeco.Usuario;
 import javafx.application.Application;
+import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -28,15 +31,21 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class TelaCadastramento extends Application implements LubrificanteSelecionadoListener {
     private Usuario usuario;
 
     private VBox layout;
 
+    private Boolean confere;
+
     private final List<PontoLubrificacao> pontosLubrificacao = new ArrayList<>();
 
     private Lubrificante lubrificante = new Lubrificante();
+
+    private Empresa empresaAdmin = new Empresa();
 
     private Lubrificante lubrificanteSalvar = new Lubrificante();
 
@@ -98,10 +107,22 @@ public class TelaCadastramento extends Application implements LubrificanteSeleci
         labelQuantidadePontos.setStyle("-fx-font-size: 16;");  // Ajuste o tamanho conforme necessário
         TextField inputQuantidadePontos = new TextField();
 
+        Label labelEmpresa = new Label("Selecione a empresa:");
+        ComboBox<String> comboBoxEmpresa = new ComboBox<>();
+        List<Empresa> empresas = new Empresa().recuperarTodos();
+        List<String> ls = new ArrayList<>();
+        for(Empresa l : empresas){
+            ls.add(l.getNome());
+            comboBoxEmpresa.setItems(FXCollections.observableArrayList(ls));
+        }
+        comboBoxEmpresa.getItems().addAll();
+        comboBoxEmpresa.visibleProperty().set(usuario.getRole().equals("admin"));
+
 
         Button confirmarButton = new Button("Confirmar");
         confirmarButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
-        confirmarButton.setOnAction(event -> processarConfirmacao(primaryStage, inputSetor.getText(), inputEquipamento.getText(), inputQuantidadePontos.getText()));
+        confirmarButton.setOnAction(event -> processarConfirmacao(primaryStage, inputSetor.getText(), inputEquipamento.getText(),
+                inputQuantidadePontos.getText(), comboBoxEmpresa.getValue()));
 
         layout = new VBox(10);
         layout.setPadding(new Insets(10));
@@ -111,7 +132,7 @@ public class TelaCadastramento extends Application implements LubrificanteSeleci
                 labelSetor, inputSetor,
                 labelEquipamento, inputEquipamento,
                 labelQuantidadePontos, inputQuantidadePontos,
-                confirmarButton
+                labelEmpresa,comboBoxEmpresa, confirmarButton
         );
         ScrollPane scrollPane = new ScrollPane(layout);
         scrollPane.setFitToWidth(true);
@@ -121,7 +142,7 @@ public class TelaCadastramento extends Application implements LubrificanteSeleci
         primaryStage.show();
     }
 
-    private void processarConfirmacao(Stage primaryStage, String setor, String equipamento, String quantidadePontosTexto) {
+    private void processarConfirmacao(Stage primaryStage, String setor, String equipamento, String quantidadePontosTexto, String empresa) {
         if (validarCampos(setor, equipamento, quantidadePontosTexto)) {
             int quantidadePontos = Integer.parseInt(quantidadePontosTexto);
 
@@ -129,7 +150,10 @@ public class TelaCadastramento extends Application implements LubrificanteSeleci
                 PontoLubrificacao ponto = new PontoLubrificacao(); // Criando uma nova instância
                 ponto.setSetor(setor);
                 ponto.setEquipamento(equipamento);
-                ponto.setEmpresa(usuario.getPessoa().getEmpresa());
+                empresaAdmin = new Empresa().buscarPessoaPorNome(empresa);
+                if (usuario.getRole().equals("admin"))
+                    ponto.setEmpresa(empresaAdmin);
+                else ponto.setEmpresa(usuario.getPessoa().getEmpresa());
                 pontosLubrificacao.add(ponto);
             }
             configurarTelaCadastroPontos(primaryStage, quantidadePontos);
@@ -353,10 +377,13 @@ public class TelaCadastramento extends Application implements LubrificanteSeleci
 
 
                 ponto.setLubrificante(lubrificanteSalvar);
+                Produto produto = new Produto().recuperarPorLubrificante(lubrificanteSalvar);
+                tratarUnidadeMedida(comboBoxUnidade.getValue(),produto, ponto);
                 if (lubrificante != null) {
                     try {
                         LocalDate dataProximaTroca = ponto.getDataProxLubrificacao().plusDays(INTERVALO_LUBRIFICACAO_DIAS);
-                        datasProximaTrocaLubrificante.add(LocalDateTime.from(dataProximaTroca));
+                        LocalDateTime dataHoraProximaTroca = dataProximaTroca.atStartOfDay();
+                        datasProximaTrocaLubrificante.add(dataHoraProximaTroca);
                     } catch (Exception e) {
                         exibirAlerta("Insira uma data válida para a próxima lubrificação.");
                         return;
@@ -366,9 +393,12 @@ public class TelaCadastramento extends Application implements LubrificanteSeleci
                     exibirAlerta("Selecione um lubrificante antes de cadastrar.");
                 }
             }
-            mostrarMensagemCadastro();
-            adicionarBotaoVoltar(primaryStage);
-            verificarProximidadeTrocaLubrificante();
+            if (confere) {
+                mostrarMensagemCadastro();
+                adicionarBotaoVoltar(primaryStage);
+                verificarProximidadeTrocaLubrificante();
+            }
+
         }
     }
 
@@ -389,7 +419,8 @@ public class TelaCadastramento extends Application implements LubrificanteSeleci
 
         TelaPesquisaLubrificantes telaPesquisa = new TelaPesquisaLubrificantes(
                 this,
-                lubrificantes.get(pontoNumero -1)
+                lubrificantes.get(pontoNumero -1),
+                empresaAdmin
         );
         Stage stagePesquisa = new Stage();
         telaPesquisa.setLubrificanteSelecionadoListener(lubrificanteSelecionado -> {
@@ -433,6 +464,34 @@ public class TelaCadastramento extends Application implements LubrificanteSeleci
             if (diasRestantes <= 7) {
                 notificationBuilder.text("PontoLubrificacao: Faltam " + diasRestantes + " dias para a próxima troca de lubrificante.");
                 notificationBuilder.showWarning();
+            }
+        }
+    }
+    private void calcularEstoque(Produto produto, PontoLubrificacao ponto){
+
+        double quantidade = produto.getQuantidade();
+        double quantidadePonto = ponto.getQuantidadeDeLubrificante();
+        double total = quantidade - quantidadePonto;
+        produto.setQuantidade(total);
+        dao.atualizar(produto);
+    }
+
+    private void tratarUnidadeMedida(UnidadeMedida unidadeMedida, Produto produto, PontoLubrificacao ponto){
+        Pattern pattern = Pattern.compile("\\b(\\d+)(kg|L)\\b", Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(produto.getLubrificante().getDescricao());
+        while (matcher.find()) {
+            String valor = matcher.group(1);
+            String unidade = matcher.group(2);
+
+            if (unidade.equalsIgnoreCase("kg") && unidadeMedida.equals(unidadeMedida.GRAMAS )) {
+                calcularEstoque(produto, ponto);
+                confere = true;
+            } else if (unidade.equalsIgnoreCase("L") && unidadeMedida.equals(unidadeMedida.LITROS)) {
+                calcularEstoque(produto, ponto);
+                confere = true;
+            } else {
+                exibirAlerta("Selecione uma unidade de medida combativel com a do lubrificante");
+                confere = false;
             }
         }
     }
