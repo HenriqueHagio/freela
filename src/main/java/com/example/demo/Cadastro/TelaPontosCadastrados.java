@@ -162,20 +162,21 @@ public class TelaPontosCadastrados extends Application {
         Label labelLubrificante = new Label("Lubrificante Total:");
         TextField inputLubrificante = new TextField();
         inputLubrificante.setEditable(false);
+        inputLubrificante.setText(ponto.getLubrificante().getDescricao());
 
 
 
         Label labelQuantidade = new Label("Quantidade:");
         TextField inputQuantidade = new TextField();
-//        inputQuantidade.setText(ponto.getQuantidadeDeLubrificante().toString());
+        inputQuantidade.setText(ponto.getQuantidadeDeLubrificante().toString());
         inputQuantidade.setEditable(editavel);
-//        ponto.setQuantidadeDeLubrificante(Integer.parseInt(inputQuantidade.getText()));
+        ponto.setQuantidadeDeLubrificante(Integer.parseInt(inputQuantidade.getText()));
 
         ComboBox<UnidadeMedida> comboBoxUnidade = new ComboBox<>();
         comboBoxUnidade.getItems().addAll(UnidadeMedida.values());
-//        comboBoxUnidade.setValue(ponto.getUnidadeMedida());
+        comboBoxUnidade.setValue(ponto.getUnidadeMedida());
         comboBoxUnidade.setEditable(editavel);
-//        ponto.setUnidadeMedida(comboBoxUnidade.getValue());
+        ponto.setUnidadeMedida(comboBoxUnidade.getValue());
 
         Label labelDataHoraLubrificacao = new Label("Data e Hora Lubrificação:");
         DatePicker datePicker = new DatePicker();
@@ -301,10 +302,10 @@ public class TelaPontosCadastrados extends Application {
 
         HBox caixa  = (HBox) layout.getChildren().get(9);
         TextField inputQtdLub  = (TextField) caixa.getChildren().get(0);
-//        ponto.setQuantidadeDeLubrificante(Integer.parseInt(inputQtdLub.getText()));
+        ponto.setQuantidadeDeLubrificante(Integer.parseInt(inputQtdLub.getText()));
 
         ComboBox<UnidadeMedida> comboBoxUnidade = (ComboBox<UnidadeMedida>) caixa.getChildren().get(1);
-//        ponto.setUnidadeMedida(comboBoxUnidade.getValue());
+        ponto.setUnidadeMedida(comboBoxUnidade.getValue());
 
         TextField inputQtdGraxa  = (TextField) layout.getChildren().get(15);
         ponto.setQuantidadeDeGraxa(Integer.parseInt(inputQtdGraxa.getText()));

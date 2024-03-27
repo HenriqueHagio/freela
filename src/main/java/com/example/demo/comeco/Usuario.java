@@ -67,6 +67,14 @@ public class Usuario {
         session.close();
         return usuarios;
     }
+    public ObservableList<Usuario> recuperarClientes() {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Criteria criteria = session.createCriteria(Usuario.class);
+        criteria.add(Restrictions.eq("role", "cliente"));
+        ObservableList<Usuario> usuarios = (ObservableList<Usuario>) criteria.list();
+        session.close();
+        return usuarios;
+    }
 
     public void salvar() {
     }

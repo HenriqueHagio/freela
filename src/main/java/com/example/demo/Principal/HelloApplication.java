@@ -248,7 +248,7 @@ public class HelloApplication extends Application {
 
         if (isAdmin(username)) {
             Button gerenciarUsuariosButton = criarBotao("Gerenciar Usuários");
-//            gerenciarUsuariosButton.setOnAction(event -> showGerenciamentoUsuarios(primaryStage));
+            gerenciarUsuariosButton.setOnAction(event -> showGerenciamentoUsuarios(primaryStage));
             menuLayout.getChildren().add(gerenciarUsuariosButton);
         }
 

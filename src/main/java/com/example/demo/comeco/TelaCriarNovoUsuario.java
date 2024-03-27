@@ -114,13 +114,13 @@ public class TelaCriarNovoUsuario {
             alert.setTitle("Sucesso");
             alert.setContentText("Usuario Criado com Sucesso");
             alert.show();
-            if (telaGerenciarClientes != null) {
-                TelaGerenciarClientes.Cliente novoCliente = new TelaGerenciarClientes.Cliente(nome, sobrenome, email, senha, empresa);
-                telaGerenciarClientes.adicionarNovoCliente(novoCliente);  // Adiciona o novo cliente à lista e atualiza a tabela
-                stage.close();
-            } else {
-                System.out.println("Erro: TelaGerenciarClientes não foi inicializada corretamente.");
-            }
+//            if (telaGerenciarClientes != null) {
+//                TelaGerenciarClientes.Usuario novoCliente = new TelaGerenciarClientes.Usuario(nome, sobrenome, email, senha, empresa);
+//                telaGerenciarClientes.adicionarNovoCliente(novoCliente);  // Adiciona o novo cliente à lista e atualiza a tabela
+//                stage.close();
+//            } else {
+//                System.out.println("Erro: TelaGerenciarClientes não foi inicializada corretamente.");
+//            }
             HelloApplication helloApplication = new HelloApplication();
             helloApplication.start(stage);
         } catch (Exception e) {

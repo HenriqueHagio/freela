@@ -15,8 +15,8 @@ import java.util.Optional;
 
 public class TelaGerenciarClientes extends Application {
 
-    private TableView<Cliente> tabelaClientes;
-    private ObservableList<Cliente> listaClientes;
+    private TableView<Usuario> tabelaClientes;
+    private ObservableList<Usuario> listaClientes;
 
     private TelaCriarNovoUsuario telaCriarNovoUsuario;
 
@@ -54,11 +54,9 @@ public class TelaGerenciarClientes extends Application {
         primaryStage.show();
 
         // Inicializa a lista de clientes
-        listaClientes = FXCollections.observableArrayList();
-        listaClientes.addAll(
-                new Cliente("John", "Doe", "john.doe@example.com", "password", "Company A"),
-                new Cliente("Jane", "Doe", "jane.doe@example.com", "secret", "Company B")
-        );
+        ObservableList<Usuario> clientes = new Usuario().recuperarClientes();
+        listaClientes =  clientes;
+
 
         tabelaClientes.setItems(listaClientes);
 
@@ -70,35 +68,35 @@ public class TelaGerenciarClientes extends Application {
         tabelaClientes = new TableView<>();
 
         // Coluna Empresa deve ser a primeira
-        TableColumn<Cliente, String> colunaEmpresa = new TableColumn<>("Empresa");
+        TableColumn<Usuario, String> colunaEmpresa = new TableColumn<>("Empresa");
         colunaEmpresa.setCellValueFactory(new PropertyValueFactory<>("empresa"));
 
-        TableColumn<Cliente, String> colunaNome = new TableColumn<>("Nome");
+        TableColumn<Usuario, String> colunaNome = new TableColumn<>("Nome");
         colunaNome.setCellValueFactory(new PropertyValueFactory<>("nome"));
 
-        TableColumn<Cliente, String> colunaSobrenome = new TableColumn<>("Sobrenome");
+        TableColumn<Usuario, String> colunaSobrenome = new TableColumn<>("Sobrenome");
         colunaSobrenome.setCellValueFactory(new PropertyValueFactory<>("sobrenome"));
 
-        TableColumn<Cliente, String> colunaEmail = new TableColumn<>("E-mail");
+        TableColumn<Usuario, String> colunaEmail = new TableColumn<>("E-mail");
         colunaEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
 
-        TableColumn<Cliente, String> colunaSenha = new TableColumn<>("Senha");
+        TableColumn<Usuario, String> colunaSenha = new TableColumn<>("Senha");
         colunaSenha.setCellValueFactory(new PropertyValueFactory<>("senha"));
 
         tabelaClientes.getColumns().addAll(colunaEmpresa, colunaNome, colunaSobrenome, colunaEmail, colunaSenha);
     }
 
     private void editarCliente() {
-        Cliente clienteSelecionado = tabelaClientes.getSelectionModel().getSelectedItem();
+        Usuario clienteSelecionado = tabelaClientes.getSelectionModel().getSelectedItem();
 
         if (clienteSelecionado != null) {
             // Criação dos campos de edição
-            TextField nomeField = new TextField(clienteSelecionado.getNome());
-            TextField sobrenomeField = new TextField(clienteSelecionado.getSobrenome());
-            TextField emailField = new TextField(clienteSelecionado.getEmail());
+            TextField nomeField = new TextField(clienteSelecionado.getPessoa().getNome());
+            TextField sobrenomeField = new TextField(clienteSelecionado.getPessoa().getNome());
+            TextField emailField = new TextField(clienteSelecionado.getPessoa().getEmail());
             PasswordField senhaField = new PasswordField();
             senhaField.setPromptText("Nova Senha");
-            TextField empresaField = new TextField(clienteSelecionado.getEmpresa());
+            TextField empresaField = new TextField(clienteSelecionado.getPessoa().getEmpresa().getNome());
 
             // Layout para os campos de edição
             VBox editarLayout = new VBox(10);
@@ -120,16 +118,16 @@ public class TelaGerenciarClientes extends Application {
 
             if (result.isPresent() && result.get() == ButtonType.OK) {
                 // Atualiza as informações do cliente
-                clienteSelecionado.setNome(nomeField.getText());
-                clienteSelecionado.setSobrenome(sobrenomeField.getText());
-                clienteSelecionado.setEmail(emailField.getText());
+                clienteSelecionado.getPessoa().setNome(nomeField.getText());
+                clienteSelecionado.getPessoa().setSobrenome(sobrenomeField.getText());
+                clienteSelecionado.getPessoa().setEmail(emailField.getText());
 
                 // Verifica se a nova senha foi fornecida e a atualiza
                 if (!senhaField.getText().isEmpty()) {
-                    clienteSelecionado.setSenha(senhaField.getText());
+                    clienteSelecionado.setPassword(senhaField.getText());
                 }
 
-                clienteSelecionado.setEmpresa(empresaField.getText());
+//                clienteSelecionado.getPessoa().setEmpresa(empresaField.getText());
 
                 // Atualiza a tabela
                 atualizarTabela();
@@ -141,14 +139,14 @@ public class TelaGerenciarClientes extends Application {
     }
 
     private void excluirCliente() {
-        Cliente clienteSelecionado = tabelaClientes.getSelectionModel().getSelectedItem();
+        Usuario clienteSelecionado = tabelaClientes.getSelectionModel().getSelectedItem();
 
         if (clienteSelecionado != null) {
             // Simula uma operação de exclusão (substitua com sua lógica real)
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Excluir Cliente");
             alert.setHeaderText(null);
-            alert.setContentText("Deseja realmente excluir o cliente: " + clienteSelecionado.getNome() + "?");
+            alert.setContentText("Deseja realmente excluir o cliente: " + clienteSelecionado.getPessoa().getNome() + "?");
 
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent() && result.get() == ButtonType.OK) {
@@ -163,7 +161,7 @@ public class TelaGerenciarClientes extends Application {
     }
 
     private void visualizarInformacoesCliente() {
-        Cliente clienteSelecionado = tabelaClientes.getSelectionModel().getSelectedItem();
+        Usuario clienteSelecionado = tabelaClientes.getSelectionModel().getSelectedItem();
 
         if (clienteSelecionado != null) {
             // Exibe as informações do cliente em uma janela de diálogo
@@ -186,7 +184,7 @@ public class TelaGerenciarClientes extends Application {
         alert.showAndWait();
     }
 
-    public void adicionarNovoCliente(Cliente novoCliente) {
+    public void adicionarNovoCliente(Usuario novoCliente) {
         if (tabelaClientes == null) {
             inicializarTabelaClientes();
         }
@@ -207,68 +205,20 @@ public class TelaGerenciarClientes extends Application {
         tabelaClientes.setItems(FXCollections.observableArrayList(listaClientes));
     }
 
-    public static class Cliente {
-        private String nome;
-        private String sobrenome;
-        private String email;
-        private String senha;
-        private String empresa;
+//    public static class Usuario {
+//        private String nome;
+//        private String sobrenome;
+//        private String email;
+//        private String senha;
+//        private String empresa;
 
-        public Cliente(String nome, String sobrenome, String email, String senha, String empresa) {
-            this.nome = nome;
-            this.sobrenome = sobrenome;
-            this.email = email;
-            this.senha = senha;
-            this.empresa = empresa;
-        }
+//        public Usuario(String nome, String sobrenome, String email, String senha, String empresa) {
+//            this.nome = nome;
+//            this.sobrenome = sobrenome;
+//            this.email = email;
+//            this.senha = senha;
+//            this.empresa = empresa;
+//        }
 
-        public String getNome() {
-            return nome;
-        }
 
-        public void setNome(String nome) {
-            this.nome = nome;
-        }
-
-        public String getSobrenome() {
-            return sobrenome;
-        }
-
-        public void setSobrenome(String sobrenome) {
-            this.sobrenome = sobrenome;
-        }
-
-        public String getEmail() {
-            return email;
-        }
-
-        public void setEmail(String email) {
-            this.email = email;
-        }
-
-        public String getSenha() {
-            return senha;
-        }
-
-        public void setSenha(String senha) {
-            this.senha = senha;
-        }
-
-        public String getEmpresa() {
-            return empresa;
-        }
-
-        public void setEmpresa(String empresa) {
-            this.empresa = empresa;
-        }
-
-        @Override
-        public String toString() {
-            return "Nome: " + nome +
-                    "\nSobrenome: " + sobrenome +
-                    "\nEmpresa: " + empresa +
-                    "\nE-mail: " + email +
-                    "\nSenha: " + senha;
-        }
-    }
 }
