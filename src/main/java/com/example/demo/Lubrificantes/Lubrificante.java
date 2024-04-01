@@ -20,7 +20,7 @@ public class Lubrificante {
      * Chave primária em UUID
      */
     @Id
-//    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @EqualsAndHashCode.Include
     protected int codigo;
     private String descricao;

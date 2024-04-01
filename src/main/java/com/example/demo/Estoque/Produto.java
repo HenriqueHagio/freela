@@ -37,7 +37,7 @@ public class Produto {
     @ManyToOne
     private Lubrificante lubrificante;
 
-    @ManyToOne
+    @ManyToOne(optional = true)
     private Empresa empresa;
 
     public Produto recuperarPorLubrificante(Lubrificante lubrificante) {

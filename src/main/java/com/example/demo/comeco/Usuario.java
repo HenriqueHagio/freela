@@ -10,6 +10,7 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -67,11 +68,11 @@ public class Usuario {
         session.close();
         return usuarios;
     }
-    public ObservableList<Usuario> recuperarClientes() {
+    public List<Usuario> recuperarClientes() {
         Session session = HibernateUtil.getSessionFactory().openSession();
         Criteria criteria = session.createCriteria(Usuario.class);
         criteria.add(Restrictions.eq("role", "cliente"));
-        ObservableList<Usuario> usuarios = (ObservableList<Usuario>) criteria.list();
+        List<Usuario> usuarios =  criteria.list();
         session.close();
         return usuarios;
     }

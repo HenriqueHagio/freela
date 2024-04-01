@@ -5,5 +5,7 @@ public interface Entidade<T> {
 
 
     void atualizar(T entidade);
+
+    void apagar(T entidade);
 }
 

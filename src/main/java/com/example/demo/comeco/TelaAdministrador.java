@@ -4,7 +4,6 @@ import com.example.demo.Cadastro.TelaPontosCadastrados;
 import com.example.demo.Estoque.TelaCadastroEstoque;
 import com.example.demo.Estoque.TelaEstoque;
 import com.example.demo.Lubrificantes.TelaLubrificantes;
-import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -20,21 +19,21 @@ import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 
 import java.io.IOException;
 
-public class TelaAdministrador extends Application {
+public class TelaAdministrador   {
 
     private Stage primaryStage;
 
-    public static void main(String[] args) {
-        launch(args);
-    }
+//    public static void main(String[] args) {
+//        launch(args);
+//    }
 
-    @Override
-    public void start(Stage primaryStage) {
+
+    public void start(Stage primaryStage, Usuario usuario) {
         this.primaryStage = primaryStage;
-        setupUI(primaryStage);
+        setupUI(primaryStage, usuario);
     }
 
-    private void setupUI(Stage primaryStage) {
+    private void setupUI(Stage primaryStage, Usuario usuario) {
         primaryStage.setTitle("Painel do Administrador");
 
         BorderPane adminLayout = new BorderPane();
@@ -58,7 +57,13 @@ public class TelaAdministrador extends Application {
         VBox menuVBox = new VBox(10);
         menuVBox.setAlignment(Pos.CENTER);
 
-        Button gerenciarClientesButton = createStyledButton("Gerenciar Clientes", this::handleManageClients);
+        Button gerenciarClientesButton = createStyledButton("Gerenciar Clientes", new Runnable() {
+            @Override
+            public void run() {
+                handleManageClients(usuario);
+            }
+        });
+
         Button cadastrarPontosButton = createStyledButton("Cadastramento de Pontos", this::abrirTelaCadastramento);
         Button pontosButton = createStyledButton("Pontos", this::abrirTelaPontos);
         Button lubrificantesButton = createStyledButton("Lubrificantes", this::abrirTelaLubrificantes);
@@ -87,10 +92,10 @@ public class TelaAdministrador extends Application {
         primaryStage.show();
     }
 
-    private void handleManageClients() {
+    private void handleManageClients(Usuario usuario) {
         TelaGerenciarClientes telaGerenciarClientes = new TelaGerenciarClientes();
         Stage gerenciarClientesStage = new Stage();
-        telaGerenciarClientes.start(gerenciarClientesStage);
+        telaGerenciarClientes.start(gerenciarClientesStage, usuario);
     }
 
     private void abrirTelaCadastramento() {

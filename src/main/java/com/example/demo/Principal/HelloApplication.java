@@ -72,7 +72,7 @@ public class HelloApplication extends Application {
                 Usuario tipoUsuario = usuario.buscarUsuarioPorNome(username);
                 try {
                     if (tipoUsuario.getRole() == "admin") {
-                        showAdminScreen(primaryStage, username);
+                        showAdminScreen(primaryStage, usuario);
                     } else {showMainMenu(primaryStage, username);}
                 }
                 catch (Exception e) {}
@@ -161,12 +161,12 @@ public class HelloApplication extends Application {
     }
     private static void showNewUserScreen(Stage primaryStage){
         TelaCriarNovoUsuario telaCriarNovoUsuario = new TelaCriarNovoUsuario();
-        telaCriarNovoUsuario.start(primaryStage);
+        telaCriarNovoUsuario.start(primaryStage, usuario);
     }
 
-    private static void showAdminScreen(Stage primaryStage, String username) {
+    private static void showAdminScreen(Stage primaryStage, Usuario username) {
         TelaAdministrador telaAdmin = new TelaAdministrador();
-        telaAdmin.start(primaryStage);
+        telaAdmin.start(primaryStage, username);
     }
 
     public static void showMainMenu(Stage primaryStage, String username) {
@@ -268,6 +268,6 @@ public class HelloApplication extends Application {
     private static void showGerenciamentoUsuarios(Stage primaryStage) {
         TelaGerenciarClientes telaGerenciamentoUsuarios = new TelaGerenciarClientes();
         Stage gerenciamentoUsuariosStage = new Stage();
-        telaGerenciamentoUsuarios.start(gerenciamentoUsuariosStage);
+        telaGerenciamentoUsuarios.start(gerenciamentoUsuariosStage, usuario);
     }
 }

@@ -219,8 +219,26 @@ public class TelaCadastroEstoque extends Application {
             List<ItemEstoque> produtosDoXML = xmlReader.lerArquivoXML(file.getPath());
             listaNovosProdutos.addAll(produtosDoXML);
             atualizarProdutosCadastrados();
+            Produto produto = new Produto();
             exibirMensagem("Produtos importados", "Produtos importados do XML com sucesso!");
-        }
+            if (listaNovosProdutos.size() > 0) {
+                for(int i = 0; i < listaNovosProdutos.size(); i++) {
+                    produto.setQuantidade(listaNovosProdutos.get(i).getQuantidadeProperty().getValue());
+                    Lubrificante lubrificante = new Lubrificante().recuperarPorNome(listaNovosProdutos.get(i).getLubrificante());
+                    if (lubrificante == null) {
+                        Lubrificante lubrificanteS = new Lubrificante(); // Crie uma nova instância de Lubrificante
+                        lubrificanteS.setDescricao(listaNovosProdutos.get(i).getNomeProduto());
+                        dao.salvar(lubrificanteS);
+                        produto.setLubrificante(lubrificanteS);
+                    } else produto.setLubrificante(lubrificante);
+                    UnidadeMedida unidadeMedida = UnidadeMedida.valueOf(listaNovosProdutos.get(i).getUnidade());
+                    produto.setUnidadeMedida(unidadeMedida);
+                    limparCampos();
+                    dao.salvar(produto);
+                }
+            }
+            }
+
     }
 
     private void exibirMensagem(String titulo, String conteudo) {

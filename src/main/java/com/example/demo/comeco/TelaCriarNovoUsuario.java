@@ -24,7 +24,7 @@ public class TelaCriarNovoUsuario {
         // Remova a inicialização desnecessária da telaGerenciarClientes aqui
     }
 
-    public void start(Stage stage) {
+    public void start(Stage stage, Usuario admin) {
         stage.setTitle("Criar Novo Usuário");
 
         VBox layout = new VBox(10);
@@ -60,6 +60,7 @@ public class TelaCriarNovoUsuario {
 
             Button cadastrarButton = new Button("Cadastrar");
             cadastrarButton.setOnAction(event -> cadastrarNovoUsuario(
+                    admin,
                     campoNome.getText(),
                     campoSobrenome.getText(),
                     campoUsername.getText(),
@@ -78,7 +79,7 @@ public class TelaCriarNovoUsuario {
             stage.show();
         }
     }
-    private void  salvarNovoUsuario(String nome, String sobrenome, String username, String email, String senha, String confirmarSenha, String empresa, Stage stage){
+    private void  salvarNovoUsuario(Usuario admin, String nome, String sobrenome, String username, String email, String senha, String confirmarSenha, String empresa, Stage stage){
         String senhaHash = BCrypt.hashpw(senha, BCrypt.gensalt());
         Usuario usuario = new Usuario();
         Empresa empresaNova = new Empresa();
@@ -102,27 +103,22 @@ public class TelaCriarNovoUsuario {
         usuario.setUsername(username);
         usuario.setPassword(senhaHash);
         usuario.setPessoa(pessoa);
-        usuario.setRole("comum");
 
 
         try {
 
             dao.salvar(pessoa);
-            usuario.setRole("comum");
+            usuario.setRole("cliente");
             dao.salvar(usuario);
             Alert alert = new Alert((Alert.AlertType.INFORMATION));
             alert.setTitle("Sucesso");
             alert.setContentText("Usuario Criado com Sucesso");
             alert.show();
-//            if (telaGerenciarClientes != null) {
-//                TelaGerenciarClientes.Usuario novoCliente = new TelaGerenciarClientes.Usuario(nome, sobrenome, email, senha, empresa);
-//                telaGerenciarClientes.adicionarNovoCliente(novoCliente);  // Adiciona o novo cliente à lista e atualiza a tabela
-//                stage.close();
-//            } else {
-//                System.out.println("Erro: TelaGerenciarClientes não foi inicializada corretamente.");
-//            }
-            HelloApplication helloApplication = new HelloApplication();
-            helloApplication.start(stage);
+            if(!admin.getRole().equals("admin")){
+                HelloApplication helloApplication = new HelloApplication();
+                helloApplication.start(stage);
+            }
+            stage.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -136,13 +132,13 @@ public class TelaCriarNovoUsuario {
         alert.show();
     }
 
-    private void cadastrarNovoUsuario(String nome, String sobrenome, String username, String email, String senha, String confirmarSenha, String empresa, Stage stage) {
+    private void cadastrarNovoUsuario(Usuario admin, String nome, String sobrenome, String username, String email, String senha, String confirmarSenha, String empresa, Stage stage) {
         if (senha.equals(confirmarSenha)) {
             Usuario verificarUsuario = new Usuario().buscarUsuarioPorNome(username);
             Pessoa verificarPessoa = new Pessoa().buscarPessoaPorEmail(email);
             if (verificarUsuario == null) {
                 if(verificarPessoa == null)
-                  salvarNovoUsuario(nome, sobrenome, username, email, senha, confirmarSenha, empresa, stage);
+                  salvarNovoUsuario(admin, nome, sobrenome, username, email, senha, confirmarSenha, empresa, stage);
                 else showError("Email já existe");
             }else showError("Usuario já existe");
 
