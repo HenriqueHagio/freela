@@ -1,11 +1,9 @@
 package com.example.demo.comeco;
 
-import com.example.demo.Cadastro.TelaCadastramento;
 import com.example.demo.Cadastro.TelaPontosCadastrados;
 import com.example.demo.Estoque.TelaCadastroEstoque;
 import com.example.demo.Estoque.TelaEstoque;
 import com.example.demo.Lubrificantes.TelaLubrificantes;
-import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -21,28 +19,28 @@ import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 
 import java.io.IOException;
 
-public class TelaAdministrador extends Application {
+public class TelaAdministrador   {
 
     private Stage primaryStage;
 
-    public static void main(String[] args) {
-        launch(args);
-    }
+//    public static void main(String[] args) {
+//        launch(args);
+//    }
 
-    @Override
-    public void start(Stage primaryStage) {
+
+    public void start(Stage primaryStage, Usuario usuario) {
         this.primaryStage = primaryStage;
-        setupUI(primaryStage);
+        setupUI(primaryStage, usuario);
     }
 
-    private void setupUI(Stage primaryStage) {
+    private void setupUI(Stage primaryStage, Usuario usuario) {
         primaryStage.setTitle("Painel do Administrador");
 
         BorderPane adminLayout = new BorderPane();
         adminLayout.setPadding(new Insets(20));
 
         // Adicionando um ImageView para um ícone ou logotipo
-        ImageView logoImageView = new ImageView(new Image("C:\\Users\\Lucas\\OneDrive\\Documentos\\Codigos Lubvel\\demo (2)\\src\\main\\java\\com\\example\\demo\\Principal\\img.png"));
+        ImageView logoImageView = new ImageView(new Image("file:src/main/java/com/example/demo/Principal/img.png"));
         logoImageView.setFitHeight(50);  // Ajuste a altura conforme necessário
         logoImageView.setPreserveRatio(true);
 
@@ -59,7 +57,13 @@ public class TelaAdministrador extends Application {
         VBox menuVBox = new VBox(10);
         menuVBox.setAlignment(Pos.CENTER);
 
-        Button gerenciarClientesButton = createStyledButton("Gerenciar Clientes", this::handleManageClients);
+        Button gerenciarClientesButton = createStyledButton("Gerenciar Clientes", new Runnable() {
+            @Override
+            public void run() {
+                handleManageClients(usuario);
+            }
+        });
+
         Button cadastrarPontosButton = createStyledButton("Cadastramento de Pontos", this::abrirTelaCadastramento);
         Button pontosButton = createStyledButton("Pontos", this::abrirTelaPontos);
         Button lubrificantesButton = createStyledButton("Lubrificantes", this::abrirTelaLubrificantes);
@@ -88,16 +92,16 @@ public class TelaAdministrador extends Application {
         primaryStage.show();
     }
 
-    private void handleManageClients() {
+    private void handleManageClients(Usuario usuario) {
         TelaGerenciarClientes telaGerenciarClientes = new TelaGerenciarClientes();
         Stage gerenciarClientesStage = new Stage();
-        telaGerenciarClientes.start(gerenciarClientesStage);
+        telaGerenciarClientes.start(gerenciarClientesStage, usuario);
     }
 
     private void abrirTelaCadastramento() {
-        TelaCadastramento telaCadastramento = new TelaCadastramento(stage -> primaryStage.show());
-        Stage cadastroPontosStage = new Stage();
-        telaCadastramento.start(cadastroPontosStage);
+//        TelaCadastramento telaCadastramento = new TelaCadastramento(stage -> primaryStage.show());
+//        Stage cadastroPontosStage = new Stage();
+//        telaCadastramento.start(cadastroPontosStage);
     }
 
     private void abrirTelaPontos() {
@@ -107,11 +111,12 @@ public class TelaAdministrador extends Application {
     }
 
     private void abrirTelaLubrificantes() {
-        TelaLubrificantes telaLubrificantes = new TelaLubrificantes();
         Stage lubrificantesStage = new Stage();
         // Substitua o caminho do arquivo conforme necessário
-        String filePath = "C:\\Users\\Lucas\\OneDrive\\Documentos\\BD_PRODUTOS_LUBVEL.xlsx";
-        telaLubrificantes.start(lubrificantesStage, filePath);
+        TelaLubrificantes telaLubrificantes = new TelaLubrificantes(lubrificantesStage);
+
+
+        telaLubrificantes.start();
     }
 
     private void abrirTelaEstoque() {
@@ -121,7 +126,7 @@ public class TelaAdministrador extends Application {
     }
 
     private void abrirTelaCadastroEstoque() throws IOException, InvalidFormatException {
-        TelaCadastroEstoque telaCadastroEstoque = new TelaCadastroEstoque();
+        TelaCadastroEstoque telaCadastroEstoque = new TelaCadastroEstoque(new Usuario());
         Stage cadastroEstoqueStage = new Stage();
         telaCadastroEstoque.start(cadastroEstoqueStage);
     }

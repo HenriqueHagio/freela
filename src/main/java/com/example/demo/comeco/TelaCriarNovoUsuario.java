@@ -2,6 +2,7 @@ package com.example.demo.comeco;
 
 import com.example.demo.Hibernate.Entidade;
 import com.example.demo.Hibernate.HibernateEntidade;
+import com.example.demo.Principal.HelloApplication;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -23,7 +24,7 @@ public class TelaCriarNovoUsuario {
         // Remova a inicialização desnecessária da telaGerenciarClientes aqui
     }
 
-    public void start(Stage stage) {
+    public void start(Stage stage, Usuario admin) {
         stage.setTitle("Criar Novo Usuário");
 
         VBox layout = new VBox(10);
@@ -59,6 +60,7 @@ public class TelaCriarNovoUsuario {
 
             Button cadastrarButton = new Button("Cadastrar");
             cadastrarButton.setOnAction(event -> cadastrarNovoUsuario(
+                    admin,
                     campoNome.getText(),
                     campoSobrenome.getText(),
                     campoUsername.getText(),
@@ -77,40 +79,71 @@ public class TelaCriarNovoUsuario {
             stage.show();
         }
     }
+    private void  salvarNovoUsuario(Usuario admin, String nome, String sobrenome, String username, String email, String senha, String confirmarSenha, String empresa, Stage stage){
+        String senhaHash = BCrypt.hashpw(senha, BCrypt.gensalt());
+        Usuario usuario = new Usuario();
+        Empresa empresaNova = new Empresa();
+        Empresa buscaEmpresa = new Empresa().buscarPessoaPorNome(empresa);
+        Pessoa pessoa = new Pessoa();
+        Entidade<Object> dao = new HibernateEntidade<>();
 
-    private void cadastrarNovoUsuario(String nome, String sobrenome, String username, String email, String senha, String confirmarSenha, String empresa, Stage stage) {
-        if (senha.equals(confirmarSenha)) {
-            String senhaHash = BCrypt.hashpw(senha, BCrypt.gensalt());
-            Usuario usuario = new Usuario();
-            Empresa empresaNova = new Empresa();
-            Pessoa pessoa = new Pessoa();
+        // Verifica se a Empresa ja existe
+        if(buscaEmpresa == null) {
             empresaNova.setNome(empresa);
-            pessoa.setNome(nome);
-            pessoa.setSobrenome(sobrenome);
-            pessoa.setEmail(email);
             pessoa.setEmpresa(empresaNova);
-            usuario.setUsername(username);
-            usuario.setPassword(senhaHash);
-            usuario.setPessoa(pessoa);
+            dao.salvar(empresaNova);
+        }
+        else {
+            pessoa.setEmpresa(buscaEmpresa);
+        }
 
-            Entidade<Object> dao = new HibernateEntidade<>();
+        pessoa.setNome(nome);
+        pessoa.setSobrenome(sobrenome);
+        pessoa.setEmail(email);
+        usuario.setUsername(username);
+        usuario.setPassword(senhaHash);
+        usuario.setPessoa(pessoa);
 
-            try {
-                dao.salvar(empresaNova);
-                dao.salvar(pessoa);
-                dao.salvar(usuario);
-                if (telaGerenciarClientes != null) {
-                    TelaGerenciarClientes.Cliente novoCliente = new TelaGerenciarClientes.Cliente(nome, sobrenome, email, senha, empresa);
-                    telaGerenciarClientes.adicionarNovoCliente(novoCliente);  // Adiciona o novo cliente à lista e atualiza a tabela
-                    stage.close();
-                } else {
-                    System.out.println("Erro: TelaGerenciarClientes não foi inicializada corretamente.");
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
+
+        try {
+
+            dao.salvar(pessoa);
+            usuario.setRole("cliente");
+            dao.salvar(usuario);
+            Alert alert = new Alert((Alert.AlertType.INFORMATION));
+            alert.setTitle("Sucesso");
+            alert.setContentText("Usuario Criado com Sucesso");
+            alert.show();
+            if(!admin.getRole().equals("admin")){
+                HelloApplication helloApplication = new HelloApplication();
+                helloApplication.start(stage);
             }
+            stage.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    private static void showError(String message) {
+        // Método para exibir mensagens de erro
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Erro");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.show();
+    }
+
+    private void cadastrarNovoUsuario(Usuario admin, String nome, String sobrenome, String username, String email, String senha, String confirmarSenha, String empresa, Stage stage) {
+        if (senha.equals(confirmarSenha)) {
+            Usuario verificarUsuario = new Usuario().buscarUsuarioPorNome(username);
+            Pessoa verificarPessoa = new Pessoa().buscarPessoaPorEmail(email);
+            if (verificarUsuario == null) {
+                if(verificarPessoa == null)
+                  salvarNovoUsuario(admin, nome, sobrenome, username, email, senha, confirmarSenha, empresa, stage);
+                else showError("Email já existe");
+            }else showError("Usuario já existe");
+
         } else {
-            System.out.println("Erro: As senhas não coincidem. Tente novamente.");
+            showError("Erro: As senhas não coincidem. Tente novamente.");
         }
     }
 }

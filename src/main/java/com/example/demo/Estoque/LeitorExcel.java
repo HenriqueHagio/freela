@@ -1,26 +1,29 @@
 package com.example.demo.Estoque;
 
 import com.example.demo.Lubrificantes.Lubrificante;
-import org.apache.poi.ss.usermodel.*;
+import com.example.demo.comeco.Empresa;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class LeitorExcel {
 
     private String descricao;
 
+    private static Lubrificante lubrificante = new Lubrificante();
+
+    private static Produto produto = new Produto();
+
+    static List<Lubrificante> listaLubrificantes = lubrificante.recuperarTodos();
+
+    static List<Lubrificante> listaLubrificantesEmpresa = new ArrayList<>();
+
+
     public LeitorExcel(String descricao) {
         this.descricao = descricao;
     }
 
     public static void main(String[] args) {
-        String filePath = "C:\\Users\\Lucas\\OneDrive\\Documentos\\Codigos Lubvel\\BD_PRODUTOS_LUBVEL.xlsx";
-        List<Lubrificante> listaLubrificantes = lerArquivoExcel(filePath);
 
         // Verificação se a lista foi preenchida corretamente
         if (listaLubrificantes != null) {
@@ -34,50 +37,36 @@ public class LeitorExcel {
         }
     }
 
-    public static List<Lubrificante> lerArquivoExcel(String filePath) {
-        List<Lubrificante> listaLubrificantes = new ArrayList<>();
+//    public static List<Lubrificante> lerArquivoExcel() {
+//
+//        Workbook workbook = new XSSFWorkbook();
+//        Sheet sheet = workbook.createSheet("Lubrificantes");
+//        TableView<Lubrificante> table = new TableView<>();
+//        TableColumn<Lubrificante, String> codigoColumn = new TableColumn<>("Código");
+//        codigoColumn.setCellValueFactory(cellData -> {
+//            String codigo = String.valueOf(cellData.getValue().getCodigo());
+//            return new SimpleStringProperty(codigo);
+//        });
+//        TableColumn<Lubrificante, String> descricaoColumn = new TableColumn<>("Descrição");
+//        descricaoColumn.setCellValueFactory(cellData -> {
+//            String codigo = cellData.getValue().getDescricao();
+//            return new SimpleStringProperty(codigo);
+//        });
+//        table.getColumns().addAll(codigoColumn, descricaoColumn);
+//
+//        int rowNum = 0;
+//        for (Lubrificante l : listaLubrificantes) {
+//            Row row = sheet.createRow(rowNum++);
+//            row.createCell(0).setCellValue(l.getCodigo());
+//            row.createCell(1).setCellValue(l.getDescricao());
+//        }
+//
+//
+//        return listaLubrificantes;
+//    }
 
-        try (FileInputStream file = new FileInputStream(new File(filePath))) {
-            Workbook workbook = WorkbookFactory.create(file);
-            Sheet sheet = workbook.getSheetAt(0); // Obtém a primeira planilha
-
-            Iterator<Row> rowIterator = sheet.iterator();
-            rowIterator.next(); // Ignora cabeçalho, se existir
-
-            while (rowIterator.hasNext()) {
-                Row row = rowIterator.next();
-
-                Cell codigoCell = row.getCell(0);
-                String codigo;
-                if (codigoCell.getCellType() == CellType.NUMERIC) {
-                    codigo = String.valueOf((int) codigoCell.getNumericCellValue());
-                } else {
-                    codigo = codigoCell.getStringCellValue();
-                }
-
-                Cell descricaoCell = row.getCell(1);
-                String descricao;
-                if (descricaoCell.getCellType() == CellType.NUMERIC) {
-                    descricao = String.valueOf((int) descricaoCell.getNumericCellValue());
-                } else {
-                    descricao = descricaoCell.getStringCellValue();
-                }
-
-                Lubrificante lubrificante = new Lubrificante(codigo, descricao);
-                listaLubrificantes.add(lubrificante);
-            }
-
-            workbook.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null; // Retorna null em caso de erro na leitura do arquivo
-        }
-
-        return listaLubrificantes;
-    }
-
-    public static List<Lubrificante> getListaLubrificantes() {
-        String filePath = "C:\\Users\\Lucas\\OneDrive\\Documentos\\BD_PRODUTOS_LUBVEL.xlsx";
-        return LeitorExcel.lerArquivoExcel(filePath);
+    public static List<Lubrificante> getListaLubrificantes(Empresa empresa) {
+        listaLubrificantesEmpresa = produto.recuperarLubrificantePorEmpresa(empresa);
+        return listaLubrificantesEmpresa;
     }
 }

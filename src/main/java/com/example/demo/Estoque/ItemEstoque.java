@@ -1,15 +1,19 @@
 package com.example.demo.Estoque;
 
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 public class ItemEstoque {
     private String nomeProduto;
-    private IntegerProperty quantidadeProperty = new SimpleIntegerProperty();
+    private DoubleProperty quantidadeProperty = new SimpleDoubleProperty();
     private String unidade;
     private String lubrificante;
 
-    public ItemEstoque(String nomeProduto, int quantidade, String unidade) {
+    public ItemEstoque(String nomeProduto, Double quantidade, String unidade) {
         this.nomeProduto = nomeProduto;
         this.quantidadeProperty.set(quantidade);
         this.unidade = unidade;
@@ -22,17 +26,11 @@ public class ItemEstoque {
         return nomeProduto;
     }
 
-    public int getQuantidade() {
-        return quantidadeProperty.get();
-    }
 
     public void setQuantidade(int quantidade) {
         this.quantidadeProperty.set(quantidade);
     }
 
-    public IntegerProperty quantidadeProperty() {
-        return quantidadeProperty;
-    }
 
     public String getUnidade() {
         return unidade;

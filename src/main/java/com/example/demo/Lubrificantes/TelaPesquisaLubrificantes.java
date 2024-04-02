@@ -1,7 +1,9 @@
 package com.example.demo.Lubrificantes;
 
 import com.example.demo.Estoque.LeitorExcel;
+import com.example.demo.comeco.Empresa;
 import javafx.application.Application;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
@@ -17,11 +19,13 @@ public class TelaPesquisaLubrificantes extends Application {
 
     private List<Lubrificante> listaLubrificantes;
     private LubrificanteSelecionadoListener listener;
-    private TextField inputLubrificante;
+    private Lubrificante inputLubrificante;
+    private Empresa empresa;
 
-    public TelaPesquisaLubrificantes(LubrificanteSelecionadoListener listener, TextField inputLubrificante) {
+    public TelaPesquisaLubrificantes(LubrificanteSelecionadoListener listener, Lubrificante inputLubrificante, Empresa empresa) {
         this.listener = listener;
         this.inputLubrificante = inputLubrificante;
+        this.empresa = empresa;
     }
 
     public static void main(String[] args) {
@@ -30,16 +34,21 @@ public class TelaPesquisaLubrificantes extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        listaLubrificantes = LeitorExcel.getListaLubrificantes();
+        listaLubrificantes = LeitorExcel.getListaLubrificantes(empresa);
 
         if (listaLubrificantes != null) {
             TableView<Lubrificante> table = new TableView<>();
 
             TableColumn<Lubrificante, String> codigoColumn = new TableColumn<>("Código");
-            codigoColumn.setCellValueFactory(cellData -> cellData.getValue().codigoProperty());
-
+            codigoColumn.setCellValueFactory(cellData -> {
+                String codigo = String.valueOf(cellData.getValue().getCodigo());
+                return new SimpleStringProperty(codigo);
+            });
             TableColumn<Lubrificante, String> descricaoColumn = new TableColumn<>("Descrição");
-            descricaoColumn.setCellValueFactory(cellData -> cellData.getValue().descricaoProperty());
+            descricaoColumn.setCellValueFactory(cellData -> {
+                String codigo = cellData.getValue().getDescricao();
+                return new SimpleStringProperty(codigo);
+            });
 
             table.getColumns().addAll(codigoColumn, descricaoColumn);
 

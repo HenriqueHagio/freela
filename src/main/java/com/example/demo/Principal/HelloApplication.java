@@ -4,6 +4,7 @@ import com.example.demo.Cadastro.TelaCadastramento;
 import com.example.demo.Cadastro.TelaPontosCadastrados;
 import com.example.demo.Estoque.TelaCadastroEstoque;
 import com.example.demo.Estoque.TelaEstoque;
+import com.example.demo.Lubrificantes.TelaCadastrarLubrificantes;
 import com.example.demo.Lubrificantes.TelaLubrificantes;
 import com.example.demo.comeco.*;
 import javafx.application.Application;
@@ -21,7 +22,7 @@ import org.mindrot.jbcrypt.BCrypt;
 import java.io.IOException;
 
 public class HelloApplication extends Application {
-
+    static Usuario usuario = new Usuario();
     private static TelaEstoque telaEstoque;
 
 
@@ -40,7 +41,7 @@ public class HelloApplication extends Application {
         loginLayout.setPadding(new Insets(20));
 
         // Adicionando um ImageView para um ícone ou logotipo
-        ImageView logoImageView = new ImageView(new Image("D:\\demo (2)\\src\\main\\java\\com\\example\\demo\\Principal\\img.png"));
+        ImageView logoImageView = new ImageView(new Image("D:\\freela\\src\\main\\java\\com\\example\\demo\\Principal\\img.png"));
         logoImageView.setFitHeight(100);  // Ajuste a altura conforme necessário
         logoImageView.setPreserveRatio(true);
 
@@ -68,11 +69,13 @@ public class HelloApplication extends Application {
 
 
             if (authenticate(username, password)) {
-                if (isAdmin(username)) {
-                    showAdminScreen(primaryStage, username);
-                } else {
-                    showMainMenu(primaryStage, username);
+                Usuario tipoUsuario = usuario.buscarUsuarioPorNome(username);
+                try {
+                    if (tipoUsuario.getRole() == "admin") {
+                        showAdminScreen(primaryStage, usuario);
+                    } else {showMainMenu(primaryStage, username);}
                 }
+                catch (Exception e) {}
             } else {
                 showError("Credenciais inválidas. Tente novamente.");
             }
@@ -125,7 +128,7 @@ public class HelloApplication extends Application {
 
     private static boolean authenticate(String username, String password) {
         // Lógica para buscar informações do usuário (incluindo a senha criptografada) a partir do banco de dados
-        Usuario usuario = new Usuario();
+
         usuario = usuario.buscarUsuarioPorNome(username);
 
         // Verifica se o usuário foi encontrado e se a senha corresponde à senha armazenada no banco de dados
@@ -158,12 +161,12 @@ public class HelloApplication extends Application {
     }
     private static void showNewUserScreen(Stage primaryStage){
         TelaCriarNovoUsuario telaCriarNovoUsuario = new TelaCriarNovoUsuario();
-        telaCriarNovoUsuario.start(primaryStage);
+        telaCriarNovoUsuario.start(primaryStage, usuario);
     }
 
-    private static void showAdminScreen(Stage primaryStage, String username) {
+    private static void showAdminScreen(Stage primaryStage, Usuario username) {
         TelaAdministrador telaAdmin = new TelaAdministrador();
-        telaAdmin.start(primaryStage);
+        telaAdmin.start(primaryStage, username);
     }
 
     public static void showMainMenu(Stage primaryStage, String username) {
@@ -176,7 +179,7 @@ public class HelloApplication extends Application {
         Button cadastrarPontosButton = criarBotao("Cadastramento de Pontos");
         cadastrarPontosButton.setOnAction(event -> {
             // Exemplo: Voltando para o menu principal
-            TelaCadastramento telaCadastramento = new TelaCadastramento(t -> primaryStage.show());
+            TelaCadastramento telaCadastramento = new TelaCadastramento(t -> primaryStage.show(), usuario);
 
             Stage cadastroPontosStage = new Stage();
             telaCadastramento.start(cadastroPontosStage);
@@ -184,19 +187,22 @@ public class HelloApplication extends Application {
 
         Button pontosButton = criarBotao("Pontos");
         pontosButton.setOnAction(event -> {
-            TelaPontosCadastrados telaPontos = new TelaPontosCadastrados();
+            TelaPontosCadastrados telaPontos = new TelaPontosCadastrados(usuario.getPessoa().getEmpresa());
             Stage pontosStage = new Stage();
-            telaPontos.start(pontosStage);
+            if(!usuario.getRole().equals("admin"))
+                telaPontos.start(pontosStage);
+            else telaPontos.telaAdm(pontosStage);
         });
-
         Button lubrificantesButton = criarBotao("Lubrificantes");
         lubrificantesButton.setOnAction(event -> {
-            TelaLubrificantes telaLubrificantes = new TelaLubrificantes();
             Stage lubrificantesStage = new Stage();
 
-            // Substitua o caminho do arquivo conforme necessário
-            String filePath = "C:\\Users\\Lucas\\OneDrive\\Documentos\\Codigos Lubvel\\BD_PRODUTOS_LUBVEL.xlsx";
-            telaLubrificantes.start(lubrificantesStage, filePath);
+
+            TelaLubrificantes telaLubrificantes = new TelaLubrificantes(lubrificantesStage);
+
+
+            telaLubrificantes.start();
+
         });
 
         Button estoqueButton = criarBotao("Estoque");
@@ -204,14 +210,11 @@ public class HelloApplication extends Application {
             telaEstoque = new TelaEstoque();
             Stage estoqueStage = new Stage();
             telaEstoque.start(estoqueStage);
+
         });
 
-        Button cadastroEstoqueButton = criarBotao("Cadastro de Estoque");
-        cadastroEstoqueButton.setOnAction(event -> {
-            TelaCadastroEstoque telaCadastroEstoque = new TelaCadastroEstoque();
-            Stage cadastroEstoqueStage = new Stage();
-            telaCadastroEstoque.start(cadastroEstoqueStage);
-        });
+
+
 
         VBox menuLayout = new VBox(20);
         menuLayout.setAlignment(Pos.CENTER);
@@ -221,17 +224,35 @@ public class HelloApplication extends Application {
                 cadastrarPontosButton,
                 pontosButton,
                 lubrificantesButton,
-                estoqueButton,
-                cadastroEstoqueButton
+                estoqueButton
         );
+        if(usuario.getRole().equals("admin")) {
+            Button cadastrarLubButton = criarBotao("Cadastrar Lubrificante");
+            cadastrarLubButton.setOnAction(event -> {
+                TelaCadastrarLubrificantes telaCadastrarLubrificantes = new TelaCadastrarLubrificantes();
+                Stage estoqueStage = new Stage();
+                telaCadastrarLubrificantes.start(estoqueStage);
+
+            });
+            menuLayout.getChildren().add(cadastrarLubButton);
+        }
+        if(usuario.getRole().equals("admin")){
+            Button cadastroEstoqueButton = criarBotao("Cadastro de Estoque");
+            cadastroEstoqueButton.setOnAction(event -> {
+            TelaCadastroEstoque telaCadastroEstoque = new TelaCadastroEstoque(usuario);
+            Stage cadastroEstoqueStage = new Stage();
+            telaCadastroEstoque.start(cadastroEstoqueStage);
+            });
+            menuLayout.getChildren().add(cadastroEstoqueButton);
+        }
 
         if (isAdmin(username)) {
             Button gerenciarUsuariosButton = criarBotao("Gerenciar Usuários");
-//            gerenciarUsuariosButton.setOnAction(event -> showGerenciamentoUsuarios(primaryStage));
+            gerenciarUsuariosButton.setOnAction(event -> showGerenciamentoUsuarios(primaryStage));
             menuLayout.getChildren().add(gerenciarUsuariosButton);
         }
 
-        Scene mainScene = new Scene(menuLayout, 500, 400);
+        Scene mainScene = new Scene(menuLayout, 500, 500);
         primaryStage.setScene(mainScene);
     }
 
@@ -244,9 +265,9 @@ public class HelloApplication extends Application {
         return button;
     }
 
-//    private static void showGerenciamentoUsuarios(Stage primaryStage) {
-//        TelaGerenciarClientes telaGerenciamentoUsuarios = new TelaGerenciarClientes();
-//        Stage gerenciamentoUsuariosStage = new Stage();
-//        telaGerenciamentoUsuarios.start(gerenciamentoUsuariosStage);
-//    }
+    private static void showGerenciamentoUsuarios(Stage primaryStage) {
+        TelaGerenciarClientes telaGerenciamentoUsuarios = new TelaGerenciarClientes();
+        Stage gerenciamentoUsuariosStage = new Stage();
+        telaGerenciamentoUsuarios.start(gerenciamentoUsuariosStage, usuario);
+    }
 }

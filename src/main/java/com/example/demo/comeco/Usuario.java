@@ -1,6 +1,7 @@
 package com.example.demo.comeco;
 
 import com.example.demo.Hibernate.HibernateUtil;
+import javafx.collections.ObservableList;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,6 +10,7 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -57,6 +59,22 @@ public class Usuario {
         Usuario usuario = (Usuario) criteria.uniqueResult();
         session.close();
        return usuario;
+    }
+
+    public ObservableList<Usuario> recuperarTodos() {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Criteria criteria = session.createCriteria(Usuario.class);
+        ObservableList<Usuario> usuarios = (ObservableList<Usuario>) criteria.list();
+        session.close();
+        return usuarios;
+    }
+    public List<Usuario> recuperarClientes() {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Criteria criteria = session.createCriteria(Usuario.class);
+        criteria.add(Restrictions.eq("role", "cliente"));
+        List<Usuario> usuarios =  criteria.list();
+        session.close();
+        return usuarios;
     }
 
     public void salvar() {
