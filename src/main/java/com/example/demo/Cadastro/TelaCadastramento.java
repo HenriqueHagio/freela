@@ -116,7 +116,7 @@ public class TelaCadastramento extends Application implements LubrificanteSeleci
             comboBoxEmpresa.setItems(FXCollections.observableArrayList(ls));
         }
         comboBoxEmpresa.getItems().addAll();
-        comboBoxEmpresa.visibleProperty().set(usuario.getRole().equals("admin"));
+//        comboBoxEmpresa.visibleProperty().set(usuario.getRole().equals("admin"));
 
 
         Button confirmarButton = new Button("Confirmar");
@@ -151,9 +151,9 @@ public class TelaCadastramento extends Application implements LubrificanteSeleci
                 ponto.setSetor(setor);
                 ponto.setEquipamento(equipamento);
                 empresaAdmin = new Empresa().buscarPessoaPorNome(empresa);
-                if (usuario.getRole().equals("admin"))
-                    ponto.setEmpresa(empresaAdmin);
-                else ponto.setEmpresa(usuario.getPessoa().getEmpresa());
+//                if (usuario.getRole().equals("admin"))
+                ponto.setEmpresa(empresaAdmin);
+//                else ponto.setEmpresa(usuario.getPessoa().getEmpresa());
                 pontosLubrificacao.add(ponto);
             }
             configurarTelaCadastroPontos(primaryStage, quantidadePontos);
@@ -190,7 +190,7 @@ public class TelaCadastramento extends Application implements LubrificanteSeleci
         equipamentoLabel.setStyle("-fx-font-size: 16; -fx-font-weight: bold;");
 
         // Adicionando um ImageView para um ícone ou logotipo
-        ImageView logoImageView = new ImageView(new Image("D:\\freela\\src\\main\\java\\com\\example\\demo\\Principal\\img.png"));
+        ImageView logoImageView = new ImageView(new Image("file:src/main/java/com/example/demo/Principal/img.png"));
         logoImageView.setFitHeight(50);  // Ajuste a altura conforme necessário
         logoImageView.setPreserveRatio(true);
 
