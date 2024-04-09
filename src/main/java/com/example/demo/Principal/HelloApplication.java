@@ -1,5 +1,6 @@
 package com.example.demo.Principal;
 
+import com.example.demo.Cadastro.PontoLubrificacao;
 import com.example.demo.Cadastro.TelaCadastramento;
 import com.example.demo.Cadastro.TelaPontosCadastrados;
 import com.example.demo.Estoque.TelaCadastroEstoque;
@@ -20,10 +21,15 @@ import javafx.stage.Stage;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 public class HelloApplication extends Application {
     static Usuario usuario = new Usuario();
     private static TelaEstoque telaEstoque;
+
+    static String texto = "";
 
 
     public static void main(String[] args) {
@@ -41,7 +47,7 @@ public class HelloApplication extends Application {
         loginLayout.setPadding(new Insets(20));
 
         // Adicionando um ImageView para um ícone ou logotipo
-        ImageView logoImageView = new ImageView(new Image("D:\\freela\\src\\main\\java\\com\\example\\demo\\Principal\\img.png"));
+        ImageView logoImageView = new ImageView(new Image("file:src/main/java/com/example/demo/Principal/img.png"));
         logoImageView.setFitHeight(100);  // Ajuste a altura conforme necessário
         logoImageView.setPreserveRatio(true);
 
@@ -70,6 +76,12 @@ public class HelloApplication extends Application {
 
             if (authenticate(username, password)) {
                 Usuario tipoUsuario = usuario.buscarUsuarioPorNome(username);
+
+                List<PontoLubrificacao> ponto = new PontoLubrificacao().buscarPontosPorEmpresaLimit(usuario.getPessoa().getEmpresa());
+                for(int i = 0; i < ponto.size(); i++){
+                    int dias = (int) ChronoUnit.DAYS.between(ponto.get(i).getDataProxLubrificacao(), LocalDate.now());
+                    texto += "A proxima lubrificação do ponto " + ponto.get(i).getPonto() + " esta agendada para " + dias + " dia(s), \n";
+                }
                 try {
                     if (tipoUsuario.getRole() == "admin") {
                         showAdminScreen(primaryStage, usuario);
@@ -175,6 +187,14 @@ public class HelloApplication extends Application {
 
         Label titleLabel = new Label("Sistema de Lubrificação - Lubvel Lubrificantes");
         titleLabel.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-padding: 10px 0;");
+        Label proxLub;
+        try {
+            proxLub = new Label(texto.substring(0, texto.length() - 3));
+
+        } catch (Exception e) {
+            proxLub = new Label("");
+        }
+        titleLabel.setStyle("-fx-font-size: 22px;  -fx-padding: 10px 0;");
 
         Button cadastrarPontosButton = criarBotao("Cadastramento de Pontos");
         cadastrarPontosButton.setOnAction(event -> {
@@ -189,7 +209,7 @@ public class HelloApplication extends Application {
         pontosButton.setOnAction(event -> {
             TelaPontosCadastrados telaPontos = new TelaPontosCadastrados(usuario.getPessoa().getEmpresa());
             Stage pontosStage = new Stage();
-            if(!usuario.getRole().equals("admin"))
+            if (!usuario.getRole().equals("admin"))
                 telaPontos.start(pontosStage);
             else telaPontos.telaAdm(pontosStage);
         });
@@ -214,19 +234,18 @@ public class HelloApplication extends Application {
         });
 
 
-
-
         VBox menuLayout = new VBox(20);
         menuLayout.setAlignment(Pos.CENTER);
         menuLayout.setStyle("-fx-background-color: #f4f4f4;");
         menuLayout.getChildren().addAll(
                 titleLabel,
+                proxLub,
                 cadastrarPontosButton,
                 pontosButton,
                 lubrificantesButton,
                 estoqueButton
         );
-        if(usuario.getRole().equals("admin")) {
+        if (usuario.getRole().equals("admin")) {
             Button cadastrarLubButton = criarBotao("Cadastrar Lubrificante");
             cadastrarLubButton.setOnAction(event -> {
                 TelaCadastrarLubrificantes telaCadastrarLubrificantes = new TelaCadastrarLubrificantes();
@@ -236,12 +255,12 @@ public class HelloApplication extends Application {
             });
             menuLayout.getChildren().add(cadastrarLubButton);
         }
-        if(usuario.getRole().equals("admin")){
+        if (usuario.getRole().equals("admin")) {
             Button cadastroEstoqueButton = criarBotao("Cadastro de Estoque");
             cadastroEstoqueButton.setOnAction(event -> {
-            TelaCadastroEstoque telaCadastroEstoque = new TelaCadastroEstoque(usuario);
-            Stage cadastroEstoqueStage = new Stage();
-            telaCadastroEstoque.start(cadastroEstoqueStage);
+                TelaCadastroEstoque telaCadastroEstoque = new TelaCadastroEstoque(usuario);
+                Stage cadastroEstoqueStage = new Stage();
+                telaCadastroEstoque.start(cadastroEstoqueStage);
             });
             menuLayout.getChildren().add(cadastroEstoqueButton);
         }

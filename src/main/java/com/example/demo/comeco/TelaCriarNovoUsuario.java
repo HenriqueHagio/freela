@@ -114,10 +114,12 @@ public class TelaCriarNovoUsuario {
             alert.setTitle("Sucesso");
             alert.setContentText("Usuario Criado com Sucesso");
             alert.show();
-            if(!admin.getRole().equals("admin")){
-                HelloApplication helloApplication = new HelloApplication();
-                helloApplication.start(stage);
-            }
+            try{
+                if(!admin.getRole().equals("admin")){
+                    HelloApplication helloApplication = new HelloApplication();
+                    helloApplication.start(stage);
+                }
+            }catch (Exception ignored) {}
             stage.close();
         } catch (Exception e) {
             e.printStackTrace();

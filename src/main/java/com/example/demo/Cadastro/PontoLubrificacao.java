@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
 import javax.persistence.*;
@@ -71,6 +72,20 @@ public class PontoLubrificacao {
         return pontos;
 
     }
+
+    public List<PontoLubrificacao> buscarPontosPorEmpresaLimit(Empresa empresa) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Criteria criteria = session.createCriteria(PontoLubrificacao.class);
+        criteria.add(Restrictions.eq("empresa", empresa));
+        criteria.add(Restrictions.gt("dataProxLubrificacao", LocalDate.now())); // Usa LocalDate para a comparação de datas
+        criteria.addOrder(Order.desc("dataProxLubrificacao")); // Ordena pela data de próxima lubrificação de forma decrescente
+        criteria.setMaxResults(5); // Limita a consulta aos 5 resultados mais recentes
+        List<PontoLubrificacao> pontos = criteria.list();
+        session.close();
+        return pontos;
+    }
+
+
 
 
 
